@@ -73,6 +73,7 @@ function responseHeaderConversion(request: Request, resHeaders: Headers): Header
 	return headers;
 }
 
+const XForwardedForIP = `104.28.${Math.floor(20+Math.random()*200)}.${Math.floor(20+Math.random()*200)}`
 function requestHeaderConversion(requestHeader: Headers): Headers {
 	const headers = new Headers();
 	for (const headerPer of requestHeader) {
@@ -83,7 +84,7 @@ function requestHeaderConversion(requestHeader: Headers): Headers {
 		}
 		headers.append(key, value);
 	}
-	headers.append("X-forwarded-for", "104.28.201.73");
+	headers.append("X-forwarded-for", XForwardedForIP);
 	return headers;
 }
 
