@@ -19,9 +19,19 @@
 
 
 ### 命令
+- 1.下载源代码
 ``` shell
 git clone https://github.com/jianjianai/microsoft-copilot-porxy
+```
+- 2.进入源代码目录
+``` shell
 cd microsoft-copilot-porxy
+```
+- 3.安装依赖包
+``` shell
 npm install
+```
+- 4.编译部署
+``` shell
 npm run deploy
 ```
