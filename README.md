@@ -12,8 +12,7 @@
 
 ## 演示站
 - 尽量自己部署吧，估计演示站几天就挂了。
-
-https://copilot.6m6c.cn/
+- https://copilot.6m6c.cn/
 
 ## 部署
 ### 环境
