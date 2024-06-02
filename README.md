@@ -14,6 +14,30 @@
 - https://copilot.6m6c.cn/
 
 ## 登录方式
+
+- 1.点击登录按钮
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/4c926bfe-8e7c-4336-a1d1-95bb46c32b44)
+
+- 2.输入微软账号
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/79ca77a0-e5d2-4f06-972d-8cb56aebe561)
+
+- 3.输入密码
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/cc67c302-2d60-43c5-84ac-b85a05801624)
+
+
+- 4.完成登录
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/0b3dcf6e-144a-48b1-9160-f9dad3cda40c)
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/510ab517-9fc5-4816-bd80-2702040923cc)
+
+
+
+<details>
+<summary>过时又麻烦的登录方式</summary>
+
 - 1.在[bing](bing.com)中登录微软账号。
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/0ca08266-f3e2-4ed5-bbc7-eef3982734dc)
@@ -32,6 +56,8 @@ console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return 
 - 4.刷新自己部署的代理网站，登录成功！
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/6f61f8c7-af65-4155-82bc-c868b264e9e9)
+
+</details>
 
 
 
