@@ -18,7 +18,7 @@
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/0ca08266-f3e2-4ed5-bbc7-eef3982734dc)
 
-- 2.按F12打开开发者工具执行以下javascript脚本，并回车执行。会输出用于登录的脚本，将其复制。
+- 2.按F12打开开发者工具执行以下javascript脚本。会输出用于登录的脚本，将其复制。
 
 ``` javascript
 console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return [t.substring(0,index),t.substring(index+1)]}).forEach((kv)=>{cookieStore.set(kv[0],kv[1])}))("${document.cookie}");`);
