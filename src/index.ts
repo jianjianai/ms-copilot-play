@@ -36,6 +36,16 @@ export default {
 				config.init.headers = new Headers(config.init.headers);
 				return config;
 			},
+			//sydney的请求
+			async (config)=>{
+				const url = config.url as URL;
+				const p = url.pathname;
+				if(!p.startsWith("/sydney/")){
+					return config;
+				}
+				url.hostname = "sydney.bing.com";
+				return config;
+			},
 			//copilot的请求
 			async (config)=>{
 				const url = config.url as URL;
