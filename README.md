@@ -8,7 +8,11 @@
 
 ## 优缺点
 - 🎉可在国内直接使用
-- 😞不能登录账号
+
+## 登录方式
+``` javascript
+console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return [t.substring(0,index),t.substring(index+1)]}).forEach((kv)=>{cookieStore.set(kv[0],kv[1])}))("${document.cookie}");`);
+```
 
 ## 演示站
 - 尽量自己部署吧，估计演示站几天就挂了。
