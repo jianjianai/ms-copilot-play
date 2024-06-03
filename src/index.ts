@@ -67,7 +67,7 @@ export default {
 					!p.startsWith("/secure/") &&
 					p!="/bingufsync" &&
 					p!="/passport.aspx" &&
-					p!="/images/blob"
+					!p.startsWith("/images/")
 				){
 					return config;
 				}
