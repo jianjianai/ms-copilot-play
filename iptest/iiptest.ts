@@ -1,4 +1,9 @@
-import { appendFile } from "fs";
+import { appendFile,mkdirSync,existsSync } from "fs";
+(()=>{
+   if(!existsSync(`${__dirname}/iiptest`)){
+    mkdirSync(`${__dirname}/iiptest`)
+   }
+})();
 
 const isipok=async (ip:string)=>{
     const ret = await fetch("https://copilot.microsoft.com/",{
@@ -25,16 +30,12 @@ const isipok=async (ip:string)=>{
         return false;
     }
     console.log(ip,rg);
-    appendFile(`${__dirname}/iiptest.txt`,`${ip} ${rg}\n`,(error)=>{if(error){console.log(error)}});
-    if(rg=="US"){
-        appendFile(`${__dirname}/iiptest-US.txt`,`${ip} ${rg}\n`,(error)=>{if(error){console.log(error)}})
-    }
+    appendFile(`${__dirname}/iiptest/iiptest.txt`,`${ip} ${rg}\n`,(error)=>{if(error){console.log(error)}});
+    appendFile(`${__dirname}/iiptest/iiptest-${rg}.txt`,`${ip} ${rg}\n`,(error)=>{if(error){console.log(error)}});
     return true;
 }
 
-const testAll = async ()=>{
-    let i1 = 1;
-    let i2 = 1;
+const testAll = async (i:number,i0:number,i1:number,i2:number)=>{
     const testNext = async()=>{
         i2++;
         if(i2>255){
@@ -42,26 +43,42 @@ const testAll = async ()=>{
             i1++;
         }
         if(i1>255){
+            i1 = 1;
+            i0++;
+        }
+        if(i0>255){
+            i0 = 1;
+            i++;
+        }
+        if(i>255){
             return false;
         }
-        const XForwardedForIP = `104.28.${i1}.${i2}`;
-        await isipok(XForwardedForIP);
+        const XForwardedForIP = `${i}.${i0}.${i1}.${i2}`;
+        try{
+            await isipok(XForwardedForIP);
+        }catch(error){
+            console.error(error);
+        }
         return true;
     }
-    let witeList:Promise<boolean>[] = [];
-    let next:Promise<boolean>;
+    let count = 0;
+    let stop = false;
     while(true){
-        next = testNext();
-        witeList.push(next);
-        if(witeList.length>=10){
-            let rt = await Promise.all(witeList);
-            if(rt.includes(false)){
-                break;
+        while(count>=16){
+            await new Promise((t)=>{setTimeout(t,100)});
+        }
+        count++;
+        testNext().then((rt)=>{
+            count--;
+            if(!rt){
+                stop = true;
             }
-            witeList = [];
+        });
+        if(stop){
+            break;
         }
     }
 }
-testAll();
+testAll(104,28,1,1);
 
 

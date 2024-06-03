@@ -172,3 +172,4 @@ dist
 .wrangler/
 
 iptest/iiptest.js
+iptest/iiptest/iiptest*.txt
