@@ -12,8 +12,9 @@
  */
 
 import { proxyLinkHttp } from "./proxyLink/proxyLinkHttp";
+import { usIps } from './ips/usIps';
 
-const XForwardedForIP = `104.28.${Math.floor(5+Math.random()*90)}.${Math.floor(20+Math.random()*200)}`;
+const XForwardedForIP = usIps[Math.floor(Math.random()*usIps.length)][0];
 console.log(XForwardedForIP)
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
