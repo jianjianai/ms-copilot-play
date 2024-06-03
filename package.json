@@ -6,7 +6,8 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "iptest":"npx tsc ./iptest/iiptest.ts & node ./iptest/iiptest.js"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.1.0",
