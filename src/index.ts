@@ -197,6 +197,7 @@ export default {
 				retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+				retBody = retBody.replace(/https?:\/\/www\.bing\.com\/images\/create\//g,`${porxyOrigin}/images/create/`);
 				// retBody = retBody.replace(/https?:\\\/\\\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin.replaceAll("/",`\\/`)}`);
 				// retBody = retBody.replaceAll(`"copilot.microsoft.com"`,`"${porxyHostName}"`);
 				// retBody = retBody.replaceAll(`"copilot.microsoft.com/"`,`"${porxyHostName}/"`);
