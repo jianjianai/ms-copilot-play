@@ -213,6 +213,9 @@ export default {
 				if(!loto){
 					return config;
 				}
+				if(!loto.toLowerCase().startsWith("http")){
+					return config;
+				}
 				const lotoUrl = new URL(loto);
 				lotoUrl.hostname = porxyHostName;
 				lotoUrl.port = porxyPort;

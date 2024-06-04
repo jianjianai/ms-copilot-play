@@ -15,6 +15,9 @@ export async function proxyLinkHttp(req:Request,reqTranslators:ReqHttpTranslator
     for(const reqT of reqTranslators){
         reqConfig = await reqT(reqConfig,req);
     }
+    if(req.url===reqConfig.url){
+        return new Response("not curl",{status:400});
+    }
     const res = await fetch(reqConfig.url,reqConfig.init);
     let resConfig:ResHttpConfig = {
         body:res.body as any,
