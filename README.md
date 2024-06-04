@@ -5,13 +5,16 @@
 
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/0ca073cb-f6b8-47ff-befd-8876399a2b3e)
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/308f7113-e5b0-4d6c-a958-ef67639323f8)
+
 
 ## 优缺点
 - 🎉可在国内直接使用
 
 ## 演示站
 - 尽量自己部署吧，估计演示站几天就挂了。
-- https://copilot.6m6c.cn/
+- Copilot -> https://copilot.6m6c.cn/
+- Designer -> https://copilot.6m6c.cn/images/create
 
 ## 登录方式
 
