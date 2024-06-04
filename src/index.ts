@@ -175,6 +175,19 @@ export default {
 				bodyjson = bodyjson.replaceAll(porxyOrigin,"https://copilot.microsoft.com");
 				config.init.body = bodyjson;
 				return config;
+			},
+			async (config)=>{
+				const url = config.url as URL;
+				const p = url.pathname;
+				if(p!="/fd/ls/l"){
+					return config;
+				}
+				let sdata = url.searchParams.get("DATA");
+				if(sdata){
+					sdata = sdata.replaceAll(porxyOrigin,"https://copilot.microsoft.com");
+					url.searchParams.set("DATA",sdata);
+				}
+				return config;
 			}
 		],[
 			//基本转换
