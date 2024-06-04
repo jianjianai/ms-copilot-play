@@ -1,7 +1,9 @@
 # microsoft-copilot-porxy
 ## 简介
 
-**cloudflare worker 的 microsoft copilot 代理。简单部署即可在国内轻松使用 microsoft copilot**
+**cloudflare worker 的 microsoft copilot 代理。**
+
+**简单部署即可在国内轻松使用原滋原味的 microsoft copilot 的几乎全部功能，聊天，笔记本，插件，图像生成，分享等等..**
 
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/0ca073cb-f6b8-47ff-befd-8876399a2b3e)
