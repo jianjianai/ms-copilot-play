@@ -44,7 +44,7 @@ export default {
 				if(!p.startsWith("/sydney/")){
 					return config;
 				}
-				url.hostname = "sydney.bing.com";
+				url.hostname = "sydney.bing.com";//设置链接
 				return config;
 			},
 			//copilot的请求
@@ -161,6 +161,19 @@ export default {
 					return config;
 				}
 				url.searchParams.set("return_url","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1");
+				return config;
+			},
+			// 修改更新会话请求
+			async (config,req)=>{
+				const url = config.url as URL;
+				const p = url.pathname;
+				if(p!="/sydney/UpdateConversation"){
+					return config;
+				}
+				//修改请求内容
+				let bodyjson = await req.text();
+				bodyjson = bodyjson.replaceAll(porxyOrigin,"https://copilot.microsoft.com");
+				config.init.body = bodyjson;
 				return config;
 			}
 		],[
