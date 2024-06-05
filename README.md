@@ -151,6 +151,13 @@ console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return 
 
 默认的 `.workers.dev` 国内已被限制访问，需要使用自定义域才可正常访问。具体方法请[点击此处](https://www.bing.com/search?q=cloudflare+workers+%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%9F%E5%90%8D)查找
 
+13 后续更新
+
+同步 github 仓库后 Workers 和 Pages 会自动同步更新。
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/f26b3753-0963-4a78-8773-7a9b6ebc1199)
+
+
 </details>
 
 ### 手动部署
