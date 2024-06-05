@@ -1,4 +1,4 @@
-![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/38c7dd09-1044-4631-a316-2d1888511701)# microsoft-copilot-porxy
+# microsoft-copilot-porxy
 ## 简介
 
 **Cloudflare Worker 的 Microsoft Copilot 代理。**
