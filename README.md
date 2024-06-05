@@ -164,7 +164,13 @@ console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return 
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/a4595828-d79d-48c8-81df-c16304941c91)
 
-默认的 `.workers.dev` 国内已被限制访问，需要使用自定义域才可正常访问。具体方法请[点击此处](https://www.bing.com/search?q=cloudflare+workers+%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%9F%E5%90%8D)查找
+
+> **默认的 `.workers.dev` 国内已被限制访问，需要使用自定义域才可正常访问。** 
+> 具体方法请[点击此处](https://www.bing.com/search?q=cloudflare+workers+%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%9F%E5%90%8D)查找
+
+
+> **免费自定义域名可以参考这个视频的 3分54秒 后的免费域名部分**
+> 【精准空降到 03:54】 https://www.bilibili.com/video/BV1Dy41187dv/?share_source=copy_web&vd_source=92a3be464320d250ae4c097a77339ef5&t=234
 
 13 后续更新
 
