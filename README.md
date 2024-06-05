@@ -79,7 +79,7 @@ console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return 
 
 
 ## 部署
-### 自动部署
+### 自动部署 (不熟悉开发流程的小伙伴推荐)
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jianjianai/microsoft-copilot-porxy)
 <details>
 <summary>详细教学，点击展开</summary>
