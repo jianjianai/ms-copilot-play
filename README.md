@@ -1,4 +1,4 @@
-# microsoft-copilot-porxy
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/38c7dd09-1044-4631-a316-2d1888511701)# microsoft-copilot-porxy
 ## 简介
 
 **Cloudflare Worker 的 Microsoft Copilot 代理。**
@@ -8,8 +8,10 @@
 **简单部署即可在国内轻松使用原滋原味的 Microsoft Copilot 的几乎全部功能，聊天，笔记本，插件，图像生成，分享等等..**
 
 
-![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/0ca073cb-f6b8-47ff-befd-8876399a2b3e)
-![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/308f7113-e5b0-4d6c-a958-ef67639323f8)
+![335075014-0ca073cb-f6b8-47ff-befd-8876399a2b3e](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/7d7b54f0-1298-4094-9764-156eb77ad709)
+![336297043-308f7113-e5b0-4d6c-a958-ef67639323f8](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/1a2571f5-1512-4ef7-9f92-0ccee08b6bd7)
+
+
 
 
 ## 优缺点
@@ -24,7 +26,9 @@
 - Designer -> https://copilot.6m6c.cn/images/create
 
 ## 登录方式
-
+<details>
+<summary>直接登录(推荐)</summary>
+	
 - 1.点击登录按钮
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/4c926bfe-8e7c-4336-a1d1-95bb46c32b44)
@@ -43,6 +47,7 @@
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/0b3dcf6e-144a-48b1-9160-f9dad3cda40c)
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/510ab517-9fc5-4816-bd80-2702040923cc)
 
+</details>
 
 
 <details>
@@ -74,6 +79,84 @@ console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return 
 
 
 ## 部署
+### 自动部署
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jianjianai/microsoft-copilot-porxy)
+<details>
+<summary>详细教学，点击展开</summary>
+
+	
+1. 点击这个部署按钮
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jianjianai/microsoft-copilot-porxy)
+
+2. 在打开的页面点击`Authorize Workers`
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/038878d6-99b1-494d-a5a1-9c0a39c30c27)
+
+3. 如果有 Cloudflare 账号则点击 `I have an account` 如果没有则点击 `Create account` 去创建一个。
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/1d6c1272-1d48-4120-9181-0eaf137851a9)
+
+4. 去复制账户id 
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/f22c5e02-0742-4222-8e91-7104756de804)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/2125bfe9-d8cd-414d-b929-a39769454233)
+
+5. 去创建APIKEY
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/6835fea6-7dc9-4520-b927-91e42e7a945d)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/93a2069e-b302-47e7-b9dd-75d8ac356e29)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/595d8bcf-fb07-405b-b8dc-97f0a012dc13)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/c2635a88-90f0-4721-aaa9-7dbd0cb8cd3a)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/448e3422-1fef-4e08-91f5-e8ce8f6b7056)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/d0b31bf6-8f69-430f-843a-ff8d3113820d)
+
+5. 连接账户
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/8909bd89-10dc-4c3d-8250-eea9b2e5f71e)
+
+6. Fork repository
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/08761a46-4a74-4c98-b7b7-36dea356068a)
+
+8. 启用 GitHub Actions
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/657b6ff3-fc35-4a6e-b62a-a504f6b2f8e5)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/1d725360-332c-4d01-adc0-0c2ab2761dc2)
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/c43605a8-338d-485c-bb39-e3f9c87d91f5)
+
+9. 部署
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/fe4fc988-3693-4283-a087-7f31ecd6ca0d)
+
+10. 成功
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/f1557d7f-0a12-4622-87ab-6236f0bbad67)
+
+11. 管理页面出现新的 Workers 和 Pages 后续可以进行其他设置。
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/98a0b65b-0019-4cad-b744-1d9454d8d4e7)
+
+12. 添加自定义域
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/a4595828-d79d-48c8-81df-c16304941c91)
+
+默认的 `.workers.dev` 国内已被限制访问，需要使用自定义域才可正常访问。具体方法请[点击此处](https://www.bing.com/search?q=cloudflare+workers+%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%9F%E5%90%8D)查找
+
+</details>
+
+### 手动部署
+<details>
+<summary>点击展开</summary>
+
 ### 环境
 |名称|下载地址|
 |-|-|
@@ -98,6 +181,9 @@ npm install
 ``` shell
 npm run deploy
 ```
+
+</details>
+
 
 
 ## 交流社区
