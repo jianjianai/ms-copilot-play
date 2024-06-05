@@ -11,10 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v2
-      - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v3
+      - name: Checkout
+        uses: actions/checkout@v4.1.5
+      - name: Deploy to Cloudflare Workers with Wrangler
+        uses: cloudflare/wrangler-action@v3.1.0
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: 'deploy --keep-vars --no-bundle'
+          # Your Cloudflare API Token
+          apiToken: ${{ secrets.CF_API_TOKEN }} # optional
+          # Your Cloudflare Account ID
+          accountId: ${{ secrets.CF_ACCOUNT_ID }} # optional
+          # The Wrangler command (along with any arguments) you wish to run. Multiple Wrangler commands can be run by separating each command with a newline. Defaults to `"deploy"`.
+          command: deploy # optional
+
+          
+
