@@ -37,60 +37,52 @@ export default {
 				config.init.headers = new Headers(config.init.headers);
 				return config;
 			},
-			//sydney的请求
+			//请求重定向
 			async (config)=>{
 				const url = config.url as URL;
 				const p = url.pathname;
-				if(!p.startsWith("/sydney/")){
-					return config;
+				//sydney的请求
+				if(p.startsWith("/sydney/")){
+					url.hostname = "sydney.bing.com";//设置链接
 				}
-				url.hostname = "sydney.bing.com";//设置链接
-				return config;
-			},
-			//copilot的请求
-			async (config)=>{
-				const url = config.url as URL;
-				const p = url.pathname;
+				//copilot的请求
 				if(
-					p!="/" && 
-					!p.startsWith("/rp/") && 
-					!p.startsWith("/fd/") &&
-					!p.startsWith("/rewardsapp/") &&
-					!p.startsWith("/notifications/") && 
-					!p.startsWith("/sa/") &&
-					!p.startsWith("/rs/") &&
-					!p.startsWith("/sharing/") &&
-					!p.startsWith("/sydchat/") &&
-					!p.startsWith("/turing/") &&
-					!p.startsWith("/th") &&
-					!p.startsWith("/Identity/") &&
-					!p.startsWith("/hamburger/") &&
-					!p.startsWith("/secure/") &&
-					p!="/bingufsync" &&
-					p!="/passport.aspx" &&
-					!p.startsWith("/images/")
+					p=="/" || 
+					p.startsWith("/rp/") || 
+					p.startsWith("/fd/") ||
+					p.startsWith("/rewardsapp/") ||
+					p.startsWith("/notifications/") || 
+					p.startsWith("/sa/") ||
+					p.startsWith("/rs/") ||
+					p.startsWith("/sharing/") ||
+					p.startsWith("/sydchat/") ||
+					p.startsWith("/turing/") ||
+					p.startsWith("/th") ||
+					p.startsWith("/Identity/") ||
+					p.startsWith("/hamburger/") ||
+					p.startsWith("/secure/") ||
+					p=="/bingufsync" ||
+					p=="/passport.aspx" ||
+					p.startsWith("/images/")
 				){
-					return config;
+					url.hostname = "copilot.microsoft.com"
 				}
-				url.hostname = "copilot.microsoft.com"
-				return config;
-			},
-			// login请求
-			async (config)=>{
-				const url = config.url as URL;
-				const p = url.pathname;
+				// login请求
 				if(
-					p!="/GetCredentialType.srf" &&
-					!p.startsWith("/ppsecure/") &&
-					p!="/login.srf" &&
-					p!="/GetOneTimeCode.srf" &&
-					p!="/GetSessionState.srf" &&
-					p!="/GetExperimentAssignments.srf" &&
-					p!="/logout.srf"
+					p=="/GetCredentialType.srf" ||
+					p.startsWith("/ppsecure/") ||
+					p=="/login.srf" ||
+					p=="/GetOneTimeCode.srf" ||
+					p=="/GetSessionState.srf" ||
+					p=="/GetExperimentAssignments.srf" ||
+					p=="/logout.srf"
 				){
-					return config;
+					url.hostname = "login.live.com"
 				}
-				url.hostname = "login.live.com"
+				//storage请求
+				if(p.startsWith("/users/")){
+					url.hostname = "storage.live.com"
+				}
 				return config;
 			},
 			// XForwardedForIP 设置
@@ -147,33 +139,30 @@ export default {
 			async (config)=>{
 				const url = config.url as URL;
 				const p = url.pathname;
-				if(p!="/secure/Passport.aspx" && p!="/passport.aspx"){
-					return config;
+				if(p=="/secure/Passport.aspx" || p=="/passport.aspx"){
+					url.searchParams.set("requrl","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1");
 				}
-				url.searchParams.set("requrl","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1");
 				return config;
 			},
 			// 修改登录请求
 			async (config)=>{
 				const url = config.url as URL;
 				const p = url.pathname;
-				if(p!="/fd/auth/signin"){
-					return config;
+				if(p=="/fd/auth/signin"){
+					url.searchParams.set("return_url","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1");
 				}
-				url.searchParams.set("return_url","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1");
 				return config;
 			},
 			// 修改更新会话请求
 			async (config,req)=>{
 				const url = config.url as URL;
 				const p = url.pathname;
-				if(p!="/sydney/UpdateConversation"){
-					return config;
+				if(p=="/sydney/UpdateConversation"){
+					//修改请求内容
+					let bodyjson = await req.text();
+					bodyjson = bodyjson.replaceAll(porxyOrigin,"https://copilot.microsoft.com");
+					config.init.body = bodyjson;
 				}
-				//修改请求内容
-				let bodyjson = await req.text();
-				bodyjson = bodyjson.replaceAll(porxyOrigin,"https://copilot.microsoft.com");
-				config.init.body = bodyjson;
 				return config;
 			},
 			async (config)=>{
@@ -224,6 +213,7 @@ export default {
 				retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/www\.bing\.com\/images\/create\//g,`${porxyOrigin}/images/create/`);
+				retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				// retBody = retBody.replace(/https?:\\\/\\\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin.replaceAll("/",`\\/`)}`);
 				// retBody = retBody.replaceAll(`"copilot.microsoft.com"`,`"${porxyHostName}"`);
 				// retBody = retBody.replaceAll(`"copilot.microsoft.com/"`,`"${porxyHostName}/"`);
