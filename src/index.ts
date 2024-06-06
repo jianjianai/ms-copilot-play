@@ -13,6 +13,7 @@
 
 import { proxyLinkHttp } from "./proxyLink/proxyLinkHttp";
 import { usIps } from './ips/usIps';
+import ClientScript from './ClientScript.html';
 
 const XForwardedForIP = usIps[Math.floor(Math.random()*usIps.length)][0];
 console.log(XForwardedForIP)
@@ -217,6 +218,12 @@ export default {
 				// retBody = retBody.replace(/https?:\\\/\\\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin.replaceAll("/",`\\/`)}`);
 				// retBody = retBody.replaceAll(`"copilot.microsoft.com"`,`"${porxyHostName}"`);
 				// retBody = retBody.replaceAll(`"copilot.microsoft.com/"`,`"${porxyHostName}/"`);
+				const resUrl = new URL(res.url);
+				
+				//特定页面注入脚本
+				if(resUrl.pathname=="/"){
+					retBody = injectionHtml(retBody);
+				}
 				config.body = retBody;
 				return config;
 			},
@@ -260,5 +267,10 @@ async function websocketPorxy(request: Request): Promise<Response> {
 		headers: headers,
 		method: request.method
 	}) as any;
+}
+
+/** 注入脚本 */
+function injectionHtml(html:string){
+    return html.replace("<head>",`<head>${ClientScript}`)
 }
 

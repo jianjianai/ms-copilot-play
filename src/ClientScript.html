@@ -1,0 +1,79 @@
+<script>
+    (() => {
+        //解析器
+        function pathOrUrl(value) {
+            if (!value) {
+                return undefined;
+            }
+            if ((typeof value) != "string") {
+                value = `${value};`
+            }
+            try {
+                return new URL(value);
+            } catch (e) {
+                if (value.startsWith("/")) {
+                    let url = new URL(`${window.location.origin}${value}`)
+                    return url
+                } else {
+                    return new URL(`${window.location.href.substring(0, window.location.href.lastIndexOf("/"))}/${value}`);
+                }
+            }
+        }
+
+        //feth请求编辑
+        const myFetch = window.fetch;
+        window.fetch = (input, init) => {
+            let url = pathOrUrl(input);
+            if (url) {
+                if (url.hostname == "www.bing.com") {
+                    url.hostname = window.location.hostname;
+                    url.port = window.location.port;
+                    url.protocol = window.location.protocol;
+                    console.log("已拦重定向请求=>", input, url.toString());
+                    return myFetch(url, init);
+                }
+            }
+            return myFetch(input, init);
+        }
+        //xml请求编辑
+        const myXMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function () {
+            let url = pathOrUrl(arguments[1]);
+            if (url) {
+                if(url.pathname=="/fd/ls/lsp.aspx"){
+                    console.log("已拦截无用请求=>", arguments);
+                    return;
+                }
+            }
+            console.log(arguments);
+            return myXMLHttpRequestOpen.apply(this, arguments);
+        }
+
+        //sendBeacon请求
+        const mySendBeacon = window.navigator.sendBeacon;
+        window.navigator.sendBeacon = (url, data)=>{
+            console.log("已拦截无用统计请求=>", url,data);
+        }
+
+        //img请求
+        const myImage = window.Image;
+        window.Image = new Proxy(myImage, {
+            construct(target, argumentsList) {
+                return new Proxy(new myImage(...argumentsList), {
+                    set(target, property, value) {
+                        const url = pathOrUrl(value);
+                        if (url) {
+                            if (url.pathname == "/fd/ls/l") {
+                                console.log("已拦截无用请求=>", value);
+                                return;
+                            }
+                        }
+                        console.log(url,value);
+                        target[property] = value;
+                    }
+                });
+            }
+        })
+        console.log("注入成功！");
+    })();
+</script>
