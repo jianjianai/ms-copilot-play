@@ -151,7 +151,7 @@ export default {
 					){
 						refererUrl.hostname = "www.bing.com"
 						refererUrl.pathname = refererUrl.pathname.replace("/pocybig/","/cdn-cgi/");
-						if(url.pathname.endsWith("/normal")){
+						if(url.pathname.endsWith("/normal")){//TODO 可能也许需要
 							refererUrl = "https://www.bing.com/";
 						}
 					}
