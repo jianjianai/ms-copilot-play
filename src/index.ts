@@ -15,6 +15,8 @@ import { proxyLinkHttp } from "./proxyLink/proxyLinkHttp";
 import { usIps } from './ips/usIps';
 import CopilotNetWork from './CopilotNetWork.html';
 import CFTuring from './CFTuring.html';
+import CFTNormalUring from './CFTNormalUring.html';
+
 
 const XForwardedForIP = usIps[Math.floor(Math.random()*usIps.length)][0];
 console.log(XForwardedForIP)
@@ -120,6 +122,7 @@ export default {
 						url.pathname.startsWith("/pocybig/")
 					){
 						originUrl.hostname = "www.bing.com"
+						// originUrl.pathname = originUrl.pathname.replace("/pocybig/","/cdn-cgi/");
 					}
 					resHeaders.set('Origin',originUrl.toString());
 				}
@@ -147,11 +150,10 @@ export default {
 						url.pathname.startsWith("/pocybig/")
 					){
 						refererUrl.hostname = "www.bing.com"
-						// if(url.pathname.endsWith("/normal")){
-						// 	refererUrl = "https://www.bing.com/";
-						// }else{
-							
-						// }
+						refererUrl.pathname = refererUrl.pathname.replace("/pocybig/","/cdn-cgi/");
+						if(url.pathname.endsWith("/normal")){
+							refererUrl = "https://www.bing.com/";
+						}
 					}
 					resHeaders.set('Referer',refererUrl.toString());
 				}
@@ -235,7 +237,7 @@ export default {
 				retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-				retBody = retBody.replace(/https?:\/\/www\.bing\.com\/images\/create\//g,`${porxyOrigin}/images/create/`);
+				retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g,`${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				// retBody = retBody.replace(/https?:\\\/\\\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin.replaceAll("/",`\\/`)}`);
 				// retBody = retBody.replaceAll(`"copilot.microsoft.com"`,`"${porxyHostName}"`);
@@ -258,9 +260,11 @@ export default {
 					retBody = retBody.replaceAll("location","myCFLocation");
 					retBody = retBody.replaceAll("window","myCFWindow");
 				}
-
 				if(resUrl.pathname.startsWith("/cdn-cgi/challenge-platform/")){
 					retBody = retBody.replaceAll("/cdn-cgi/","/pocybig/");
+					if(resUrl.pathname.endsWith("/normal")){
+						retBody = injectionHtml(retBody,CFTNormalUring);
+					}
 				}
 				config.body = retBody;
 				return config;
