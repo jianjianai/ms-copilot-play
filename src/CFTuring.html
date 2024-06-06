@@ -1,0 +1,75 @@
+<script>
+    //验证通过器
+
+    var myCFLocation = new Proxy(location, {
+        get(target, property) {
+            console.log("get", property);
+            if (property == "href") {
+                let url = new URL(location.href);
+                url.protocol = "https:"
+                url.port = "";
+                url.hostname = "www.bing.com"
+                return url.toString();
+            }
+            if (property == "origin") {
+                let url = new URL(location.origin);
+                url.protocol = "https:"
+                url.port = "";
+                url.hostname = "www.bing.com"
+                return url.toString();
+            }
+            if (property == "host" || property == "hostname") {
+                return "www.bing.com"
+            }
+            return location[property];
+        }
+    });
+    var myCFWindow = new Proxy(window, {
+        get(target, property, receiver) {
+            if (property == "location" || property == "myCFLocation") {
+                return myCFLocation;
+            }
+            const rtf = window[property];
+            if ((typeof rtf) == "function") {
+                return function () {
+                    return rtf(...arguments);
+                }
+            }
+            return rtf;
+        }
+    });
+
+    (() => {
+        //解析器
+        function pathOrUrl(value) {
+            if (!value) {
+                return undefined;
+            }
+            if ((typeof value) != "string") {
+                value = `${value};`
+            }
+            try {
+                return new URL(value);
+            } catch (e) {
+                if (value.startsWith("/")) {
+                    let url = new URL(`${window.location.origin}${value}`)
+                    return url
+                } else {
+                    return new URL(`${window.location.href.substring(0, window.location.href.lastIndexOf("/"))}/${value}`);
+                }
+            }
+        }
+        //feth请求编辑
+        const myFetch = window.fetch;
+        window.fetch = (input, init) => {
+            let url = pathOrUrl(input);
+            if (url) {
+                url.pathname = url.pathname.replace("/cdn-cgi/","/pocybig/");
+                console.log("已拦重定向请求=>", input, url.toString());
+                return myFetch(url, init);
+            }
+            return myFetch(input, init);
+        }
+    })();
+    console.log("注入成功！");
+</script>

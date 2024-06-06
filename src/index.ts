@@ -13,7 +13,8 @@
 
 import { proxyLinkHttp } from "./proxyLink/proxyLinkHttp";
 import { usIps } from './ips/usIps';
-import ClientScript from './ClientScript.html';
+import CopilotNetWork from './CopilotNetWork.html';
+import CFTuring from './CFTuring.html';
 
 const XForwardedForIP = usIps[Math.floor(Math.random()*usIps.length)][0];
 console.log(XForwardedForIP)
@@ -84,6 +85,11 @@ export default {
 				if(p.startsWith("/users/")){
 					url.hostname = "storage.live.com"
 				}
+				//challenges.cloudflare.com
+				if(p.startsWith("/turnstile/") || p.startsWith("/pocybig/")){
+					url.hostname = "challenges.cloudflare.com"
+					url.pathname = url.pathname.replace("/pocybig/","/cdn-cgi/");
+				}
 				return config;
 			},
 			// XForwardedForIP 设置
@@ -110,6 +116,11 @@ export default {
 					){
 						originUrl.hostname = "login.live.com"
 					}
+					if(
+						url.pathname.startsWith("/pocybig/")
+					){
+						originUrl.hostname = "www.bing.com"
+					}
 					resHeaders.set('Origin',originUrl.toString());
 				}
 				return config;
@@ -120,7 +131,7 @@ export default {
 				const referer = resHeaders.get('Referer');
 				if(referer){
 					const url = config.url as URL;
-					const refererUrl = new URL(referer);
+					let refererUrl:URL|string = new URL(referer);
 					refererUrl.protocol = "https:";
 					refererUrl.port = '';
 					refererUrl.hostname =  "copilot.microsoft.com"
@@ -131,6 +142,16 @@ export default {
 						url.pathname=="/GetCredentialType.srf"
 					){
 						refererUrl.hostname =  "login.live.com"
+					}
+					if(
+						url.pathname.startsWith("/pocybig/")
+					){
+						refererUrl.hostname = "www.bing.com"
+						// if(url.pathname.endsWith("/normal")){
+						// 	refererUrl = "https://www.bing.com/";
+						// }else{
+							
+						// }
 					}
 					resHeaders.set('Referer',refererUrl.toString());
 				}
@@ -205,7 +226,8 @@ export default {
 			//txt文本域名替换
 			async (config,res)=>{
 				const resHeaders = config.init.headers as Headers;
-				if (!res.headers.get("Content-Type")?.startsWith("text/")) {
+				const contentType = res.headers.get("Content-Type");
+				if (!contentType || (!contentType.startsWith("text/") && !contentType.startsWith("application/javascript"))) {
 					return config;
 				}
 				resHeaders.delete("Content-Md5");
@@ -222,7 +244,23 @@ export default {
 				
 				//特定页面注入脚本
 				if(resUrl.pathname=="/"){
-					retBody = injectionHtml(retBody);
+					retBody = injectionHtml(retBody,CopilotNetWork);
+				}
+				//验证页面转换
+				if(resUrl.pathname=="/turing/captcha/challenge"){
+					retBody = retBody.replaceAll("https://challenges.cloudflare.com",`${porxyOrigin}`);
+					retBody = injectionHtml(retBody,CFTuring);
+				}
+				//验证脚本转换
+				if(resUrl.pathname.startsWith("/turnstile/") && resUrl.pathname.endsWith("/api.js")){
+					retBody = retBody.replaceAll("https://challenges.cloudflare.com",`${porxyOrigin}`)
+					retBody = retBody.replaceAll("/cdn-cgi/","/pocybig/");
+					retBody = retBody.replaceAll("location","myCFLocation");
+					retBody = retBody.replaceAll("window","myCFWindow");
+				}
+
+				if(resUrl.pathname.startsWith("/cdn-cgi/challenge-platform/")){
+					retBody = retBody.replaceAll("/cdn-cgi/","/pocybig/");
 				}
 				config.body = retBody;
 				return config;
@@ -270,7 +308,7 @@ async function websocketPorxy(request: Request): Promise<Response> {
 }
 
 /** 注入脚本 */
-function injectionHtml(html:string){
-    return html.replace("<head>",`<head>${ClientScript}`)
+function injectionHtml(html:string,sc:string){
+    return html.replace("<head>",`<head>${sc}`)
 }
 
