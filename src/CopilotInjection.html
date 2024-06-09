@@ -1,0 +1,119 @@
+<script>
+    (() => {
+        //解析器
+        function pathOrUrl(value) {
+            if (!value) {
+                return null;
+            }
+            if (value instanceof URL) {
+                return value;
+            }
+            if ((typeof value) != "string") {
+                value = `${value};`
+            }
+            try {
+                return new URL(value);
+            } catch (e) {
+                if (value.startsWith("/")) {
+                    let url = new URL(`${window.location.origin}${value}`)
+                    return url
+                } else {
+                    return new URL(`${window.location.href.substring(0, window.location.href.lastIndexOf("/"))}/${value}`);
+                }
+            }
+        }
+
+        //重定向url到自己
+        function redirectToLoc(url) {
+            url.searchParams.set("cprt",url.hostname);
+            url.searchParams.set("cprtp",url.port);
+            url.searchParams.set("cprtl",url.protocol);
+            url.hostname = window.location.hostname;
+            url.port = window.location.port;
+            url.protocol = window.location.protocol;
+            return url;
+        }
+
+        // url编辑
+        function urlEdit(url) {
+            if (
+                url.hostname == "www.bing.com" ||
+                url.hostname == "copilot.microsoft.com" ||
+                url.hostname == "bat.bing.com" ||
+                url.hostname == "sydney.bing.com"
+            ) {
+                url = redirectToLoc(url);
+                console.log("edit =>",url);
+            }
+            return url;
+        }
+
+        //feth请求编辑
+        const myFetch = window.fetch;
+        window.fetch = (input, init) => {
+            let url = pathOrUrl(input);
+            if (!url) {
+                return myFetch(input, init);
+            }
+            return myFetch(urlEdit(url), init);
+        }
+
+        //xml请求编辑
+        const myXMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function () {
+            let url = pathOrUrl(arguments[1]);
+            if (!url) {
+                return myXMLHttpRequestOpen.apply(this, arguments);
+            }
+            if (url.pathname == "/fd/ls/lsp.aspx") {
+                console.log("已拦截无用请求=>", arguments);
+                this.intercepted_mscp = true;
+                return;
+            }
+            arguments[1] = urlEdit(url);
+            return myXMLHttpRequestOpen.apply(this, arguments);
+        }
+        const myXMLHttpRequestSend = window.XMLHttpRequest.prototype.send;
+        window.XMLHttpRequest.prototype.send = function () {
+            if (this.intercepted_mscp) {
+                console.log("已拦截无用请求=>>>>>>>>>>>", this);
+                return;
+            }
+            return myXMLHttpRequestSend.apply(this, arguments);
+        }
+        const myXMLSetRequestHeader = window.XMLHttpRequest.prototype.setRequestHeader
+        window.XMLHttpRequest.prototype.setRequestHeader = function(){
+            if (this.intercepted_mscp) {
+                console.log("已拦截无用请求=>>>>>>>>>>>", this);
+                return;
+            }
+            return myXMLSetRequestHeader.apply(this, arguments);
+        }
+
+        //sendBeacon请求
+        const mySendBeacon = window.navigator.sendBeacon;
+        window.navigator.sendBeacon = (url, data) => {
+            console.log("已拦截无用统计请求=>", url, data);
+        }
+
+        //img请求
+        const myImage = window.Image;
+        window.Image = new Proxy(myImage, {
+            construct(target, argumentsList) {
+                return new Proxy(new myImage(...argumentsList), {
+                    set(target, property, value) {
+                        const url = pathOrUrl(value);
+                        if (url) {
+                            if (url.pathname == "/fd/ls/l") {
+                                console.log("已拦截无用请求=>", value);
+                                return;
+                            }
+                        }
+                        console.log(url, value);
+                        target[property] = value;
+                    }
+                });
+            }
+        })
+    })();
+</script>

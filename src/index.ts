@@ -13,7 +13,7 @@
 
 import { proxyLinkHttp } from "./proxyLink/proxyLinkHttp";
 import { usIps } from './ips/usIps';
-import CopilotNetWork from './CopilotNetWork.html';
+import CopilotInjection from './CopilotInjection.html';
 import CFTuring from './CFTuring.html';
 import CFTNormalUring from './CFTNormalUring.html';
 
@@ -124,7 +124,7 @@ export default {
 						originUrl.hostname = "www.bing.com"
 						// originUrl.pathname = originUrl.pathname.replace("/pocybig/","/cdn-cgi/");
 					}
-					resHeaders.set('Origin',originUrl.toString());
+					resHeaders.set('Origin',originUrl.origin);
 				}
 				return config;
 			},
@@ -164,7 +164,7 @@ export default {
 				const url = config.url as URL;
 				const p = url.pathname;
 				if(p=="/secure/Passport.aspx" || p=="/passport.aspx"){
-					url.searchParams.set("requrl","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1");
+					url.searchParams.set("requrl","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1");
 				}
 				return config;
 			},
@@ -173,7 +173,7 @@ export default {
 				const url = config.url as URL;
 				const p = url.pathname;
 				if(p=="/fd/auth/signin"){
-					url.searchParams.set("return_url","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1&wlexpsignin=1");
+					url.searchParams.set("return_url","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1");
 				}
 				return config;
 			},
@@ -201,7 +201,27 @@ export default {
 					url.searchParams.set("DATA",sdata);
 				}
 				return config;
+			},
+			//不同域重定向转换
+			async (config)=>{
+				const url = config.url as URL;
+				if(url.searchParams.has("cprt")){
+					url.hostname = url.searchParams.get("cprt");
+					url.searchParams.delete("cprt");
+					return config;
+				}
+				if(url.searchParams.has("cprtp")){
+					url.port = url.searchParams.get("cprtp");
+					url.searchParams.delete("cprtp");
+
+				}
+				if(url.searchParams.has("cprtl")){
+					url.protocol = url.searchParams.get("cprtl");
+					url.searchParams.delete("cprtl");
+				}
+				return config;
 			}
+
 		],[
 			//基本转换
 			async (config)=>{
@@ -229,7 +249,7 @@ export default {
 			async (config,res)=>{
 				const resHeaders = config.init.headers as Headers;
 				const contentType = res.headers.get("Content-Type");
-				if (!contentType || (!contentType.startsWith("text/") && !contentType.startsWith("application/javascript"))) {
+				if (!contentType || (!contentType.startsWith("text/") && !contentType.startsWith("application/javascript") && !contentType.startsWith("application/json"))) {
 					return config;
 				}
 				resHeaders.delete("Content-Md5");
@@ -239,14 +259,12 @@ export default {
 				retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g,`${porxyOrigin}`);
 				retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-				// retBody = retBody.replace(/https?:\\\/\\\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin.replaceAll("/",`\\/`)}`);
-				// retBody = retBody.replaceAll(`"copilot.microsoft.com"`,`"${porxyHostName}"`);
-				// retBody = retBody.replaceAll(`"copilot.microsoft.com/"`,`"${porxyHostName}/"`);
+
 				const resUrl = new URL(res.url);
 				
 				//特定页面注入脚本
 				if(resUrl.pathname=="/"){
-					retBody = injectionHtml(retBody,CopilotNetWork);
+					retBody = injectionHtml(retBody,CopilotInjection);
 				}
 				//验证页面转换
 				if(resUrl.pathname=="/turing/captcha/challenge"){
