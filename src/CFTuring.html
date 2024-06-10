@@ -1,7 +1,8 @@
 <script>
     //验证通过器
 
-    var myCFLocation = new Proxy(location, {
+    
+    window.myCFLocation = new Proxy(location, {
         get(target, property) {
             console.log("get", property);
             if (property == "href") {
@@ -24,19 +25,6 @@
             return location[property];
         }
     });
-    var myCFWindow = new Proxy(window, {
-        get(target, property, receiver) {
-            if (property == "location" || property == "myCFLocation") {
-                return myCFLocation;
-            }
-            const rtf = window[property];
-            if ((typeof rtf) == "function") {
-                return function () {
-                    return rtf(...arguments);
-                }
-            }
-            return rtf;
-        }
-    });
+    document.myCFLocation =  window.myCFLocation;
     console.log("注入成功！");
 </script>

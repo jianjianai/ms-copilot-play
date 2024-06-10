@@ -149,7 +149,7 @@ export default {
 					if(
 						url.pathname.startsWith("/pocybig/")
 					){
-						refererUrl.hostname = "www.bing.com"
+						refererUrl.hostname = "challenges.cloudflare.com"
 						refererUrl.pathname = refererUrl.pathname.replace("/pocybig/","/cdn-cgi/");
 						if(url.pathname.endsWith("/normal")){//TODO 可能也许需要
 							refererUrl = "https://www.bing.com/";
@@ -206,17 +206,17 @@ export default {
 			async (config)=>{
 				const url = config.url as URL;
 				if(url.searchParams.has("cprt")){
-					url.hostname = url.searchParams.get("cprt");
+					url.hostname = url.searchParams.get("cprt") as string;
 					url.searchParams.delete("cprt");
 					return config;
 				}
 				if(url.searchParams.has("cprtp")){
-					url.port = url.searchParams.get("cprtp");
+					url.port = url.searchParams.get("cprtp") as string;
 					url.searchParams.delete("cprtp");
 
 				}
 				if(url.searchParams.has("cprtl")){
-					url.protocol = url.searchParams.get("cprtl");
+					url.protocol = url.searchParams.get("cprtl") as string;
 					url.searchParams.delete("cprtl");
 				}
 				return config;
@@ -254,14 +254,20 @@ export default {
 				}
 				resHeaders.delete("Content-Md5");
 				let retBody = await res.text();
-				retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-				retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-				retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-				retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g,`${porxyOrigin}`);
-				retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-
 				const resUrl = new URL(res.url);
-				
+
+				if(
+					!resUrl.pathname.startsWith("/turing/") && 
+					!resUrl.pathname.startsWith("/turnstile/") &&
+					!resUrl.pathname.startsWith("/cdn-cgi/")
+				){
+					retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+					retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+					retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+					retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g,`${porxyOrigin}`);
+					retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+				}
+
 				//特定页面注入脚本
 				if(resUrl.pathname=="/"){
 					retBody = injectionHtml(retBody,CopilotInjection);
@@ -276,7 +282,6 @@ export default {
 					retBody = retBody.replaceAll("https://challenges.cloudflare.com",`${porxyOrigin}`)
 					retBody = retBody.replaceAll("/cdn-cgi/","/pocybig/");
 					retBody = retBody.replaceAll("location","myCFLocation");
-					retBody = retBody.replaceAll("window","myCFWindow");
 				}
 				if(resUrl.pathname.startsWith("/cdn-cgi/challenge-platform/")){
 					retBody = retBody.replaceAll("/cdn-cgi/","/pocybig/");
