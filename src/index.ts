@@ -167,16 +167,28 @@ export default {
 				const url = config.url as URL;
 				const p = url.pathname;
 				if(p=="/secure/Passport.aspx" || p=="/passport.aspx"){
-					url.searchParams.set("requrl","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1");
+					let requrl = url.searchParams.get("requrl");
+					if(requrl){
+						url.searchParams.set("requrl",requrl.replace(porxyOrigin,"https://copilot.microsoft.com"));
+					}
 				}
-				return config;
-			},
-			// 修改登录请求
-			async (config)=>{
-				const url = config.url as URL;
-				const p = url.pathname;
 				if(p=="/fd/auth/signin"){
-					url.searchParams.set("return_url","https://copilot.microsoft.com/?wlsso=1&wlexpsignin=1");
+					let requrl = url.searchParams.get("return_url");
+					if(requrl){
+						url.searchParams.set("return_url",requrl.replace(porxyOrigin,"https://copilot.microsoft.com"));
+					}
+				}
+				if(p=="/Identity/Dropdown"){
+					let requrl = url.searchParams.get("ru");
+					if(requrl){
+						url.searchParams.set("ru",requrl.replace(porxyOrigin,"https://copilot.microsoft.com"));
+					}
+				}
+				if(p=="/login.srf"){
+					let requrl = url.searchParams.get("wreply");
+					if(requrl){
+						url.searchParams.set("wreply",requrl.replace(porxyOrigin,"https://copilot.microsoft.com"));
+					}
 				}
 				return config;
 			},
