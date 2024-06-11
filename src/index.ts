@@ -67,7 +67,10 @@ export default {
 					p.startsWith("/secure/") ||
 					p=="/bingufsync" ||
 					p=="/passport.aspx" ||
-					p.startsWith("/images/")
+					p.startsWith("/images/") ||
+					p.startsWith("/idp/") ||
+					p.startsWith("/cdx/") ||
+					p.startsWith("/pwa/")
 				){
 					url.hostname = "copilot.microsoft.com"
 				}
