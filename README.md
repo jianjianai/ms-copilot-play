@@ -9,6 +9,7 @@
 
 
 ![335075014-0ca073cb-f6b8-47ff-befd-8876399a2b3e](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/7d7b54f0-1298-4094-9764-156eb77ad709)
+![屏幕截图 2024-06-11 150121](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/486884a0-c250-4850-807f-23e93332b760)
 ![336297043-308f7113-e5b0-4d6c-a958-ef67639323f8](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/1a2571f5-1512-4ef7-9f92-0ccee08b6bd7)
 
 
@@ -25,6 +26,7 @@
 
 ## 演示站
 - Copilot -> https://copilot.6m6c.cn/
+- Copilot(新版) -> https://copilot.6m6c.cn/?dpwa=1
 - Designer -> https://copilot.6m6c.cn/images/create
 
 ## 登录方式
