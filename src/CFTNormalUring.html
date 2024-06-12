@@ -44,22 +44,11 @@
         document.createElement = function () {
             const el = document.myCreateElement(...arguments);
             if (arguments[0] == "img") {
-                // el = new Proxy(el,{
-                //     set(target, property, value){
-                //         console.log("setImg",property,value);
-                //         target[property] = value;
-                //     }
-                // })
-                Object.defineProperty(el, "src", {
-                    set(value) {
-                        console.log("set img src",value);
-                        value = value.replace("/cdn-cgi/","/pocybig/");
-                        el.setAttribute("src",value);
-                        console.log(el);
-                    },
-                    get() {
-                        return el.getAttribute("src");
-                    }
+                const elSrcSet = el.__proto__.__lookupSetter__('src');
+                el.__proto__.__defineSetter__('src', function (value) {
+                    value = value.replace("/cdn-cgi/","/pocybig/");
+                    elSrcSet.call(this, value);
+                    console.log(el);
                 })
                 console.log("createElement", el, arguments);
             }
