@@ -1,9 +1,10 @@
 <script>
+    //copilot主页面
     (() => {
         //解析器
         function pathOrUrl(value) {
             if (!value) {
-                return null;
+                return value;
             }
             if (value instanceof URL) {
                 return value;
@@ -23,26 +24,38 @@
             }
         }
 
-        //重定向url到自己
-        function redirectToLoc(url) {
-            url.searchParams.set("cprt", url.hostname);
-            url.searchParams.set("cprtp", url.port);
-            url.searchParams.set("cprtl", url.protocol);
-            url.hostname = window.location.hostname;
-            url.port = window.location.port;
-            url.protocol = window.location.protocol;
-            return url;
+        //是否放行
+        function isItReleased(url) {
+            if (!url) {
+                return true;
+            }
+            if (
+                url.pathname == "/fd/ls/ls.gif" || 
+                url.pathname == "/fd/ls/l" ||
+                url.pathname == "/fd/ls/lsp.aspx"
+            ) {
+                return false;
+            }
+            return true;
         }
 
         // url编辑
         function urlEdit(url) {
+            if(!url){
+                return url;
+            }
             if (
                 url.hostname == "www.bing.com" ||
                 url.hostname == "copilot.microsoft.com" ||
                 url.hostname == "bat.bing.com" ||
                 url.hostname == "sydney.bing.com"
             ) {
-                url = redirectToLoc(url);
+                url.searchParams.set("cprt", url.hostname);
+                url.searchParams.set("cprtp", url.port);
+                url.searchParams.set("cprtl", url.protocol);
+                url.hostname = window.location.hostname;
+                url.port = window.location.port;
+                url.protocol = window.location.protocol;
                 console.log("edit =>", url);
             }
             return url;
@@ -50,24 +63,23 @@
 
         //feth请求编辑
         const myFetch = window.fetch;
-        window.fetch = (input, init) => {
+        window.fetch = async (input, init) => {
             let url = pathOrUrl(input);
-            if (!url) {
-                return myFetch(input, init);
+            if(!isItReleased(url)){
+                console.log("已拦截无用请求=>", input,init);
+                throw new Error("404!!!");
             }
-            return myFetch(urlEdit(url), init);
+            url = urlEdit(url);
+            return myFetch(url, init);
         }
 
         //xml请求编辑
         const myXMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function () {
             let url = pathOrUrl(arguments[1]);
-            if (!url) {
-                return myXMLHttpRequestOpen.apply(this, arguments);
-            }
-            if (url.pathname == "/fd/ls/lsp.aspx") {
-                console.log("已拦截无用请求=>", arguments);
+            if(!isItReleased(url)){
                 this.intercepted_mscp = true;
+                console.log("已拦截无用请求=>", arguments);
                 return;
             }
             arguments[1] = urlEdit(url);
@@ -92,8 +104,13 @@
 
         //sendBeacon请求
         const mySendBeacon = window.navigator.sendBeacon;
-        window.navigator.sendBeacon = (url, data) => {
-            console.log("已拦截无用统计请求=>", url, data);
+        window.navigator.sendBeacon = (qurl, data) => {
+            let url = pathOrUrl(qurl);
+            if(!isItReleased(url)){
+                console.log("已拦截无用统计请求=>", qurl, data);
+                return;
+            }
+            return mySendBeacon.call(window.navigator,qurl,data);
         }
 
         //img请求
@@ -104,11 +121,9 @@
                 const imgSrcSet = img.__proto__.__lookupSetter__('src');
                 img.__proto__.__defineSetter__('src', function (value) {
                     const url = pathOrUrl(value);
-                    if (url) {
-                        if (url.pathname == "/fd/ls/l") {
-                            console.log("已拦截无用请求=>", value);
-                            return;
-                        }
+                    if(!isItReleased(url)){
+                        console.log("已拦截无用请求=>", value);
+                        return;
                     }
                     imgSrcSet.call(this, value);
                     console.log(img);

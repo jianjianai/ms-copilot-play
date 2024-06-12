@@ -13,10 +13,11 @@
 
 import { proxyLinkHttp } from "./proxyLink/proxyLinkHttp";
 import { usIps } from './ips/usIps';
-import CopilotInjection from './CopilotInjection.html';
-import CFTuring from './CFTuring.html';
-import CFTNormalUring from './CFTNormalUring.html';
-
+import CopilotInjection from './html/CopilotInjection.html';
+import CFTuring from './html/CFTuring.html';
+import CFTNormalUring from './html/CFTNormalUring.html';
+import MusicInJection from './html/MusicInJection.html';
+import ImagesCreateInJection from './html/ImagesCreateInJection.html';
 
 const XForwardedForIP = usIps[Math.floor(Math.random()*usIps.length)][0];
 console.log(XForwardedForIP)
@@ -292,6 +293,17 @@ export default {
 				if(resUrl.pathname=="/turing/captcha/challenge"){
 					retBody = retBody.replaceAll("https://challenges.cloudflare.com",`${porxyOrigin}`);
 					retBody = injectionHtml(retBody,CFTuring);
+				}
+				//音乐页面脚本注入
+				if(resUrl.pathname=="/videos/music"){
+					retBody = injectionHtml(retBody,MusicInJection);
+				}
+				//图片生成注入
+				if(
+					resUrl.pathname=="/images/create" || 
+					(resUrl.pathname.startsWith("/images/create/") && !resUrl.pathname.startsWith("/images/create/async/"))
+				){
+					retBody = injectionHtml(retBody,ImagesCreateInJection);
 				}
 				//验证脚本转换
 				if(resUrl.pathname.startsWith("/turnstile/") && resUrl.pathname.endsWith("/api.js")){

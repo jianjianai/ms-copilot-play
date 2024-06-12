@@ -1,0 +1,119 @@
+<script>
+    // 音乐生成子页面
+    (() => {
+        //解析器
+        function pathOrUrl(value) {
+            if (!value) {
+                return value;
+            }
+            if (value instanceof URL) {
+                return value;
+            }
+            if ((typeof value) != "string") {
+                value = `${value};`
+            }
+            try {
+                return new URL(value);
+            } catch (e) {
+                if (value.startsWith("/")) {
+                    let url = new URL(`${window.location.origin}${value}`)
+                    return url
+                } else {
+                    return new URL(`${window.location.href.substring(0, window.location.href.lastIndexOf("/"))}/${value}`);
+                }
+            }
+        }
+
+        //是否放行
+        function isItReleased(url) {
+            if (!url) {
+                return true;
+            }
+            if (
+                url.pathname == "/fd/ls/ls.gif" || 
+                url.pathname == "/fd/ls/l" ||
+                url.pathname == "/fd/ls/lsp.aspx"
+            ) {
+                return false;
+            }
+            return true;
+        }
+
+        // url编辑
+        function urlEdit(url) {
+            return url;
+        }
+
+        //feth请求编辑
+        const myFetch = window.fetch;
+        window.fetch = async (input, init) => {
+            let url = pathOrUrl(input);
+            if(!isItReleased(url)){
+                console.log("已拦截无用请求=>", input,init);
+                throw new Error("404!!!");
+            }
+            url = urlEdit(url);
+            return myFetch(url, init);
+        }
+
+        //xml请求编辑
+        const myXMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function () {
+            let url = pathOrUrl(arguments[1]);
+            if(!isItReleased(url)){
+                this.intercepted_mscp = true;
+                console.log("已拦截无用请求=>", arguments);
+                return;
+            }
+            arguments[1] = urlEdit(url);
+            return myXMLHttpRequestOpen.apply(this, arguments);
+        }
+        const myXMLHttpRequestSend = window.XMLHttpRequest.prototype.send;
+        window.XMLHttpRequest.prototype.send = function () {
+            if (this.intercepted_mscp) {
+                console.log("已拦截无用请求=>>>>>>>>>>>", this);
+                return;
+            }
+            return myXMLHttpRequestSend.apply(this, arguments);
+        }
+        const myXMLSetRequestHeader = window.XMLHttpRequest.prototype.setRequestHeader
+        window.XMLHttpRequest.prototype.setRequestHeader = function () {
+            if (this.intercepted_mscp) {
+                console.log("已拦截无用请求=>>>>>>>>>>>", this);
+                return;
+            }
+            return myXMLSetRequestHeader.apply(this, arguments);
+        }
+
+        //sendBeacon请求
+        const mySendBeacon = window.navigator.sendBeacon;
+        window.navigator.sendBeacon = (qurl, data) => {
+            let url = pathOrUrl(qurl);
+            if(!isItReleased(url)){
+                console.log("已拦截无用统计请求=>", qurl, data);
+                return;
+            }
+            return mySendBeacon.call(window.navigator,qurl,data);
+        }
+
+        //img请求
+        const myImage = window.Image;
+        window.Image = new Proxy(myImage, {
+            construct(target, argumentsList) {
+                const img = new myImage(...argumentsList);
+                const imgSrcSet = img.__proto__.__lookupSetter__('src');
+                img.__proto__.__defineSetter__('src', function (value) {
+                    const url = pathOrUrl(value);
+                    if(!isItReleased(url)){
+                        console.log("已拦截无用请求=>", value);
+                        return;
+                    }
+                    imgSrcSet.call(this, value);
+                    console.log(img);
+                });
+                return img;
+            }
+        });
+
+    })();
+</script>
