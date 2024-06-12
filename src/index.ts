@@ -70,7 +70,8 @@ export default {
 					p.startsWith("/images/") ||
 					p.startsWith("/idp/") ||
 					p.startsWith("/cdx/") ||
-					p.startsWith("/pwa/")
+					p.startsWith("/pwa/") ||
+					p.startsWith("/videos/")
 				){
 					url.hostname = "copilot.microsoft.com"
 				}
