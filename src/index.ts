@@ -18,6 +18,7 @@ import CFTuring from './html/CFTuring.html';
 import CFTNormalUring from './html/CFTNormalUring.html';
 import MusicInJection from './html/MusicInJection.html';
 import ImagesCreateInJection from './html/ImagesCreateInJection.html';
+import LoginInJectionBody from './html/LoginInJectionBody.html';
 
 const XForwardedForIP = usIps[Math.floor(Math.random()*usIps.length)][0];
 console.log(XForwardedForIP)
@@ -287,23 +288,23 @@ export default {
 
 				//特定页面注入脚本
 				if(resUrl.pathname=="/"){
-					retBody = injectionHtml(retBody,CopilotInjection);
+					retBody = injectionHtmlToHead(retBody,CopilotInjection);
 				}
 				//验证页面转换
 				if(resUrl.pathname=="/turing/captcha/challenge"){
 					retBody = retBody.replaceAll("https://challenges.cloudflare.com",`${porxyOrigin}`);
-					retBody = injectionHtml(retBody,CFTuring);
+					retBody = injectionHtmlToHead(retBody,CFTuring);
 				}
 				//音乐页面脚本注入
 				if(resUrl.pathname=="/videos/music"){
-					retBody = injectionHtml(retBody,MusicInJection);
+					retBody = injectionHtmlToHead(retBody,MusicInJection);
 				}
 				//图片生成注入
 				if(
 					resUrl.pathname=="/images/create" || 
 					(resUrl.pathname.startsWith("/images/create/") && !resUrl.pathname.startsWith("/images/create/async/"))
 				){
-					retBody = injectionHtml(retBody,ImagesCreateInJection);
+					retBody = injectionHtmlToHead(retBody,ImagesCreateInJection);
 				}
 				//验证脚本转换
 				if(resUrl.pathname.startsWith("/turnstile/") && resUrl.pathname.endsWith("/api.js")){
@@ -314,8 +315,11 @@ export default {
 				if(resUrl.pathname.startsWith("/cdn-cgi/challenge-platform/")){
 					retBody = retBody.replaceAll("/cdn-cgi/","/pocybig/");
 					if(resUrl.pathname.endsWith("/normal")){
-						retBody = injectionHtml(retBody,CFTNormalUring);
+						retBody = injectionHtmlToHead(retBody,CFTNormalUring);
 					}
+				}
+				if(resUrl.pathname=="/login.srf"){
+					retBody = injectionHtmlToBody(retBody,LoginInJectionBody);
 				}
 				config.body = retBody;
 				return config;
@@ -362,8 +366,13 @@ async function websocketPorxy(request: Request): Promise<Response> {
 	}) as any;
 }
 
-/** 注入脚本 */
-function injectionHtml(html:string,sc:string){
+/** 注入到head */
+function injectionHtmlToHead(html:string,sc:string){
     return html.replace("<head>",`<head>${sc}`)
+}
+
+/** 注入到body */
+function injectionHtmlToBody(html:string,sc:string){
+    return html.replace("<body>",`<body>${sc}`)
 }
 
