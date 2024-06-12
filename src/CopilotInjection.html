@@ -25,9 +25,9 @@
 
         //重定向url到自己
         function redirectToLoc(url) {
-            url.searchParams.set("cprt",url.hostname);
-            url.searchParams.set("cprtp",url.port);
-            url.searchParams.set("cprtl",url.protocol);
+            url.searchParams.set("cprt", url.hostname);
+            url.searchParams.set("cprtp", url.port);
+            url.searchParams.set("cprtl", url.protocol);
             url.hostname = window.location.hostname;
             url.port = window.location.port;
             url.protocol = window.location.protocol;
@@ -43,7 +43,7 @@
                 url.hostname == "sydney.bing.com"
             ) {
                 url = redirectToLoc(url);
-                console.log("edit =>",url);
+                console.log("edit =>", url);
             }
             return url;
         }
@@ -82,7 +82,7 @@
             return myXMLHttpRequestSend.apply(this, arguments);
         }
         const myXMLSetRequestHeader = window.XMLHttpRequest.prototype.setRequestHeader
-        window.XMLHttpRequest.prototype.setRequestHeader = function(){
+        window.XMLHttpRequest.prototype.setRequestHeader = function () {
             if (this.intercepted_mscp) {
                 console.log("已拦截无用请求=>>>>>>>>>>>", this);
                 return;
@@ -100,20 +100,22 @@
         const myImage = window.Image;
         window.Image = new Proxy(myImage, {
             construct(target, argumentsList) {
-                return new Proxy(new myImage(...argumentsList), {
-                    set(target, property, value) {
-                        const url = pathOrUrl(value);
-                        if (url) {
-                            if (url.pathname == "/fd/ls/l") {
-                                console.log("已拦截无用请求=>", value);
-                                return;
-                            }
+                const img = new myImage(...argumentsList);
+                const imgSrcSet = img.__proto__.__lookupSetter__('src');
+                img.__proto__.__defineSetter__('src', function (value) {
+                    const url = pathOrUrl(value);
+                    if (url) {
+                        if (url.pathname == "/fd/ls/l") {
+                            console.log("已拦截无用请求=>", value);
+                            return;
                         }
-                        console.log(url, value);
-                        target[property] = value;
                     }
+                    imgSrcSet.call(this, value);
+                    console.log(img);
                 });
+                return img;
             }
-        })
+        });
+
     })();
 </script>
