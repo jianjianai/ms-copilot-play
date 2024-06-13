@@ -181,7 +181,7 @@ export default {
 						url.searchParams.set("return_url",requrl.replace(porxyOrigin,"https://copilot.microsoft.com"));
 					}
 				}
-				if(p=="/Identity/Dropdown"){
+				if(p=="/Identity/Dropdown" || p=="/Identity/Hamburger"){
 					let requrl = url.searchParams.get("ru");
 					if(requrl){
 						url.searchParams.set("ru",requrl.replace(porxyOrigin,"https://copilot.microsoft.com"));
