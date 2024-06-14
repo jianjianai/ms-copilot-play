@@ -6,7 +6,8 @@
     "deploy": "rollup --config rollup.config.workers.mjs && wrangler deploy",
     "dev": "rollup --config rollup.config.workers.mjs && wrangler dev",
     "cf-typegen": "rollup --config rollup.config.workers.mjs && wrangler types",
-    "page": "rollup --config rollup.config.pages.mjs",
+    "build-worker": "rollup --config rollup.config.workers.mjs",
+    "build-page": "rollup --config rollup.config.pages.mjs",
     "iptest": "npx tsc ./iptest/iiptest.ts && node ./iptest/iiptest.js"
   },
   "devDependencies": {
