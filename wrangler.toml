@@ -1,6 +1,6 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "microsoft-copilot-porxy"
-main = "src/index.ts"
+main = "dist/index.js"
 compatibility_date = "2024-05-24"
 compatibility_flags = ["nodejs_compat"]
 
