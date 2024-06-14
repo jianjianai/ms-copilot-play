@@ -94,11 +94,38 @@ console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return 
 
 </details>
 
+## CloudFlare Pages 部署
+<details>
+<summary>详细教学，点击展开</summary>
+
+1.Fork此仓库
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/d61bf46d-7edf-43de-b66c-ede1f8cefed2)
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/3a4be71a-bd12-4938-add8-00998c5ca0aa)
+
+2. Page连接到GitHub
+
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/598dd9c8-05d9-46dc-9c9b-a15da56ff0b5)
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/85286d7c-913e-4550-b867-344e537077b6)
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/c118fe5b-1684-40f5-9b5a-b719d22e17be)
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/78ffc287-f472-4758-8df1-2f14aa5a70a4)
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/cd63bb70-6e6d-435f-8691-0f7734e88605)
+
+3. 设置设置仓库
+
+输入构建命令
+``` shell
+npm run build-page
+```
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/02fbfe54-f760-4a02-9946-e57ca3ecb648)
+
+之后就完成了。
+![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/ce012d84-7df9-426b-877e-42e6fe77872e)
+
+</details>
 
 
-
-
-## 部署
+## CloudFlare Worker 部署
 ### 自动部署 (不熟悉开发流程的小伙伴推荐)
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jianjianai/microsoft-copilot-porxy)
 <details>
