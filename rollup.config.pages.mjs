@@ -11,7 +11,7 @@ export default {
     input: 'src/pages.ts',
     output: [
         {
-            file: 'dist/functions/index.js',
+            file: 'functions/_middleware.js',
             format: 'es',
             plugins:[
                 terser()
