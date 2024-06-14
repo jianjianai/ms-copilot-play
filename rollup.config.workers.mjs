@@ -13,9 +13,6 @@ export default {
         {
             file: 'dist/index.js',
             format: 'es',
-            plugins:[
-                
-            ]
         }
     ],
     plugins:[
@@ -24,6 +21,8 @@ export default {
         html({
 			include: '**/*.html'
 		}),
-        compiler()
+        compiler({
+            compilation_level:"ADVANCED"
+        })
     ]
 };
