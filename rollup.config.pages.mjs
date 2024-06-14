@@ -21,6 +21,8 @@ export default {
         html({
 			include: '**/*.html'
 		}),
-        compiler()
+        compiler({
+            compilation_level:"ADVANCED"
+        })
     ]
 };
