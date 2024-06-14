@@ -12,10 +12,7 @@ export default {
     output: [
         {
             file: 'dist/index.js',
-            format: 'es',
-            plugins:[
-                
-            ]
+            format: 'es'
         }
     ],
     plugins:[
