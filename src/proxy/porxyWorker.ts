@@ -1,8 +1,6 @@
 import { proxyLinkHttp } from "./proxyLinkHttp";
 import usIps from '../ips/usIps.json';
 import CopilotInjection from '../html/CopilotInjection.html';
-import CFTuring from '../html/CFTuring.html';
-import CFTNormalUring from '../html/CFTNormalUring.html';
 import MusicInJection from '../html/MusicInJection.html';
 import ImagesCreateInJection from '../html/ImagesCreateInJection.html';
 import LoginInJectionBody from '../html/LoginInJectionBody.html';
@@ -89,11 +87,6 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
             if (p.startsWith("/users/")) {
                 url.hostname = "storage.live.com"
             }
-            //challenges.cloudflare.com
-            if (p.startsWith("/turnstile/") || p.startsWith("/pocybig/")) {
-                url.hostname = "challenges.cloudflare.com"
-                url.pathname = url.pathname.replace("/pocybig/", "/cdn-cgi/");
-            }
             return config;
         },
         // XForwardedForIP 设置
@@ -120,12 +113,6 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                 ) {
                     originUrl.hostname = "login.live.com"
                 }
-                if (
-                    url.pathname.startsWith("/pocybig/")
-                ) {
-                    originUrl.hostname = "www.bing.com"
-                    // originUrl.pathname = originUrl.pathname.replace("/pocybig/","/cdn-cgi/");
-                }
                 resHeaders.set('Origin', originUrl.origin);
             }
             return config;
@@ -147,15 +134,6 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                     url.pathname == "/GetCredentialType.srf"
                 ) {
                     refererUrl.hostname = "login.live.com"
-                }
-                if (
-                    url.pathname.startsWith("/pocybig/")
-                ) {
-                    refererUrl.hostname = "challenges.cloudflare.com"
-                    refererUrl.pathname = refererUrl.pathname.replace("/pocybig/", "/cdn-cgi/");
-                    if (url.pathname.endsWith("/normal")) {//TODO 可能也许需要
-                        refererUrl = "https://www.bing.com/";
-                    }
                 }
                 resHeaders.set('Referer', refererUrl.toString());
             }
@@ -270,26 +248,15 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
             let retBody = await res.text();
             const resUrl = new URL(res.url);
 
-            if (
-                !resUrl.pathname.startsWith("/turing/") &&
-                !resUrl.pathname.startsWith("/turnstile/") &&
-                !resUrl.pathname.startsWith("/cdn-cgi/")
-            ) {
-                retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-                retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-                retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-                retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-                retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-            }
+            retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+            retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+            retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+            retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+            retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
 
             //特定页面注入脚本
             if (resUrl.pathname == "/") {
                 retBody = injectionHtmlToHead(retBody, CopilotInjection);
-            }
-            //验证页面转换
-            if (resUrl.pathname == "/turing/captcha/challenge") {
-                retBody = retBody.replaceAll("https://challenges.cloudflare.com", `${porxyOrigin}`);
-                retBody = injectionHtmlToHead(retBody, CFTuring);
             }
             //音乐页面脚本注入
             if (resUrl.pathname == "/videos/music") {
@@ -301,18 +268,6 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                 (resUrl.pathname.startsWith("/images/create/") && !resUrl.pathname.startsWith("/images/create/async/"))
             ) {
                 retBody = injectionHtmlToHead(retBody, ImagesCreateInJection);
-            }
-            //验证脚本转换
-            if (resUrl.pathname.startsWith("/turnstile/") && resUrl.pathname.endsWith("/api.js")) {
-                retBody = retBody.replaceAll("https://challenges.cloudflare.com", `${porxyOrigin}`)
-                retBody = retBody.replaceAll("/cdn-cgi/", "/pocybig/");
-                retBody = retBody.replaceAll("location", "myCFLocation");
-            }
-            if (resUrl.pathname.startsWith("/cdn-cgi/challenge-platform/")) {
-                retBody = retBody.replaceAll("/cdn-cgi/", "/pocybig/");
-                if (resUrl.pathname.endsWith("/normal")) {
-                    retBody = injectionHtmlToHead(retBody, CFTNormalUring);
-                }
             }
             if (resUrl.pathname == "/login.srf") {
                 retBody = injectionHtmlToBody(retBody, LoginInJectionBody);
