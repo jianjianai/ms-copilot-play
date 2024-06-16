@@ -7,7 +7,7 @@
             const convId = window.parent.CIB.manager.conversation.id;
             const rid = window.parent.CIB.manager.conversation.messages[0].requestId;
             const iframeid = new URL(window.location.href).searchParams.get('iframeid');
-            const T = await window.parent.aesEncrypt(window.parent._G.AT, window.parent._G.IG);
+            const T = await window.parent.aesEncrypt('Harry-zklcdc/go-proxy-bingai',IG);
 
             await fetch('/challenge/verify?IG=' + encodeURI(IG) + '&iframeid=' + encodeURI(iframeid) + '&convId=' + encodeURI(convId) + '&rid=' + encodeURI(rid) + '&T=' + encodeURI(T), {
                 credentials: 'include',
