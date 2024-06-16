@@ -4,7 +4,7 @@ import CopilotInjection from '../html/CopilotInjection.html';
 import MusicInJection from '../html/MusicInJection.html';
 import ImagesCreateInJection from '../html/ImagesCreateInJection.html';
 import LoginInJectionBody from '../html/LoginInJectionBody.html';
-import { verify } from './GoBingaiPass';
+import { verify } from './goBingaiPass';
 import ChallengeResponseBody from '../html/ChallengeResponseBody.html'
 
 
