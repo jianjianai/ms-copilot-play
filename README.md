@@ -191,6 +191,7 @@ console.log(`((c)=>c.split(/; ?/).map((t)=>{const index = t.indexOf("=");return 
 ### 环境
 |名称|下载地址|
 |-|-|
+|wget|```apt install wget```|
 |git|https://git-scm.com/download|
 |nodejs|https://nodejs.org|
 

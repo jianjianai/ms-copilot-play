@@ -2,6 +2,7 @@ import json from '@rollup/plugin-json';
 import typescript from '@rollup/plugin-typescript';
 import html from 'rollup-plugin-html';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
+import { wasm } from '@rollup/plugin-wasm';
 
 // rollup.config.mjs
 // ---cut-start---
@@ -17,6 +18,7 @@ export default {
     ],
     plugins:[
         typescript(),
+        wasm(),
         json(),
         html({
 			include: '**/*.html'
