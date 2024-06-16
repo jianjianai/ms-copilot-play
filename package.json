@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "download-go-bingai-pass": "wget https://github.com/Harry-zklcdc/go-bingai-pass/releases/latest/download/go-bingai-pass.wasm -O go-bingai-pass.wasm",
+    "download-go-bingai-pass": "wget https://github.com/Harry-zklcdc/go-bingai-pass/releases/latest/download/go-bingai-pass.wasm -O src/go-bingai-pass/go-bingai-pass.wasm",
     "deploy": "npm run build-worker && wrangler deploy",
     "dev": "npm run build-worker && wrangler dev",
     "build-worker-only": "rollup --config rollup.config.workers.mjs",

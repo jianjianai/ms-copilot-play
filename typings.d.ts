@@ -4,6 +4,6 @@ declare module "*.html" {
 }
 
 declare module "*.wasm" {
-    const wasm: Promise<any>;
+    const wasm: (imports?:Imports)=>Promise<WebAssembly.Module>;
     export default wasm;
 }

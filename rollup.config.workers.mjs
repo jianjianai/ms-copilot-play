@@ -18,13 +18,15 @@ export default {
     ],
     plugins:[
         typescript(),
-        wasm(),
+        wasm({
+            targetEnv:"auto-inline"
+        }),
         json(),
         html({
 			include: '**/*.html'
 		}),
-        compiler({
-            compilation_level:"ADVANCED"
-        })
+        // compiler({
+        //     compilation_level:"ADVANCED"
+        // })
     ]
 };

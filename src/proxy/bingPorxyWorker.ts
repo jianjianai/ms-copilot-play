@@ -1,41 +1,91 @@
-import { proxyLinkHttp } from "./proxyLinkHttp";
+import { newProxyLinkHttp } from "./proxyLinkHttp";
 import usIps from '../ips/usIps.json';
 import CopilotInjection from '../html/CopilotInjection.html';
 import MusicInJection from '../html/MusicInJection.html';
 import ImagesCreateInJection from '../html/ImagesCreateInJection.html';
 import LoginInJectionBody from '../html/LoginInJectionBody.html';
+import { verify } from './GoBingaiPass';
+import ChallengeResponseBody from '../html/ChallengeResponseBody.html'
+
 
 const XForwardedForIP = usIps[Math.floor(Math.random() * usIps.length)][0];
-console.log(XForwardedForIP)
 
+/** websocket */
+async function websocketPorxy(request: Request): Promise<Response> {
+    const reqUrl = new URL(request.url);
+    reqUrl.hostname = 'sydney.bing.com';
+    reqUrl.protocol = 'https:';
+    reqUrl.port = '';
+    const headers = new Headers(request.headers);
+    if (headers.get("origin")) {
+        headers.set("origin", "https://copilot.microsoft.com")
+    }
+    headers.append("X-forwarded-for", XForwardedForIP);
+    return fetch(reqUrl, {
+        body: request.body,
+        headers: headers,
+        method: request.method
+    }) as any;
+}
 
-export async function porxyWorker(request: Request, env: Env): Promise<Response> {
-    const upgradeHeader = request.headers.get('Upgrade');
-    if (upgradeHeader && upgradeHeader == 'websocket') {
-        return websocketPorxy(request);
-    }
-    // 处理 CORS 请求
-    if (request.method === 'OPTIONS') {
-        return handleOptions(request);
-    }
-    const url = new URL(request.url);
-    const porxyHostName = url.hostname; //域名
-    const porxyOrigin = url.origin;
-    const porxyPort = url.port;
-    const porxyProtocol = url.protocol;
-    return proxyLinkHttp(request, [
-        //基础转换
-        async (config) => {
-            const url = new URL(config.url);
+/** CORS */
+function handleOptions(request: Request) {
+    let url = new URL(request.url);
+    const corsHeaders = {
+        // 'Access-Control-Allow-Origin': *,
+        'Access-Control-Allow-Origin': url.origin,
+        'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
+        'Access-Control-Allow-Headers': request.headers.get('Access-Control-Request-Headers') || '',
+        'Access-Control-Max-Age': '86400',
+    };
+    return new Response(null, { headers: corsHeaders });
+}
+
+/** 注入到head */
+function injectionHtmlToHead(html: string, sc: string) {
+    return html.replace("<head>", `<head>${sc}`)
+}
+
+/** 注入到body */
+function injectionHtmlToBody(html: string, sc: string) {
+    return html.replace("<body>", `<body>${sc}`)
+}
+
+export const bingPorxyWorker = newProxyLinkHttp<Env>({
+    async intercept(req, env) {//拦截
+        // 处理 websocket
+        const upgradeHeader = req.headers.get('Upgrade');
+        if (upgradeHeader && upgradeHeader == 'websocket') {
+            return websocketPorxy(req);
+        }
+        // 处理 CORS 请求
+        if (req.method === 'OPTIONS') {
+            return handleOptions(req);
+        }
+        //验证
+        const reqUrl = new URL(req.url);
+        if (reqUrl.pathname == "/challenge/verify") {
+            return verify(req);
+        }
+        if(reqUrl.pathname == '/turing/captcha/challenge' && (!reqUrl.searchParams.get('h'))){
+            return new Response(ChallengeResponseBody,{
+                headers:{
+                    'Content-Type':"text/html; charset=utf-8"
+                }
+            });
+        }
+        return null;
+    },
+    async reqTranslator(config, req, env) {//修改请求
+        const url = new URL(config.url);
+        config.url = url;
+        {   //基础转换
             url.port = ""
             url.protocol = 'https:';
-            config.url = url;
             config.init.headers = new Headers(config.init.headers);
-            return config;
-        },
-        //请求重定向
-        async (config) => {
-            const url = config.url as URL;
+        }
+
+        {//重定向请求
             const p = url.pathname;
             //sydney的请求
             if (p.startsWith("/sydney/")) {
@@ -68,7 +118,7 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                 url.hostname = "copilot.microsoft.com"
             }
             // bing请求
-            if(p.startsWith("/opaluqu/")){
+            if (p.startsWith("/opaluqu/")) {
                 url.hostname = "www.bing.com"
             }
             // login请求
@@ -87,16 +137,17 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
             if (p.startsWith("/users/")) {
                 url.hostname = "storage.live.com"
             }
-            return config;
-        },
+            //bing验证请求
+            if(p=='/turing/captcha/challenge'){
+                url.hostname = "www.bing.com";
+                url.searchParams.delete('h');
+            }
+        }
+
         // XForwardedForIP 设置
-        async (config) => {
-            const resHeaders = config.init.headers as Headers;
-            resHeaders.set("X-forwarded-for", XForwardedForIP);
-            return config;
-        },
-        // origin 设置
-        async (config) => {
+        (config.init.headers as Headers).set("X-forwarded-for", XForwardedForIP);
+
+        {// origin 设置
             const resHeaders = config.init.headers as Headers;
             const origin = resHeaders.get('Origin');
             if (origin) {
@@ -115,10 +166,9 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                 }
                 resHeaders.set('Origin', originUrl.origin);
             }
-            return config;
-        },
-        // Referer 设置
-        async (config) => {
+        }
+
+        {// Referer 设置
             const resHeaders = config.init.headers as Headers;
             const referer = resHeaders.get('Referer');
             if (referer) {
@@ -137,12 +187,11 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                 }
                 resHeaders.set('Referer', refererUrl.toString());
             }
-            return config;
-        },
-        // 修改登录请求 /secure/Passport.aspx 
-        async (config) => {
-            const url = config.url as URL;
+        }
+
+        {//修改登录请求 /secure/Passport.aspx 
             const p = url.pathname;
+            const porxyOrigin = new URL(req.url).origin;
             if (p == "/secure/Passport.aspx" || p == "/passport.aspx") {
                 let requrl = url.searchParams.get("requrl");
                 if (requrl) {
@@ -167,78 +216,62 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                     url.searchParams.set("wreply", requrl.replace(porxyOrigin, "https://copilot.microsoft.com"));
                 }
             }
-            return config;
-        },
-        // 修改更新会话请求
-        async (config, req) => {
-            const url = config.url as URL;
-            const p = url.pathname;
+            // 修改更新会话请求
             if (p == "/sydney/UpdateConversation") {
                 //修改请求内容
                 let bodyjson = await req.text();
                 bodyjson = bodyjson.replaceAll(porxyOrigin, "https://copilot.microsoft.com");
                 config.init.body = bodyjson;
             }
-            return config;
-        },
-        async (config) => {
-            const url = config.url as URL;
-            const p = url.pathname;
-            if (p != "/fd/ls/l") {
-                return config;
+            // 修改统计请求内容
+            if (p == "/fd/ls/l") {
+                let sdata = url.searchParams.get("DATA");
+                if (sdata) {
+                    sdata = sdata.replaceAll(porxyOrigin, "https://copilot.microsoft.com");
+                    url.searchParams.set("DATA", sdata);
+                }
             }
-            let sdata = url.searchParams.get("DATA");
-            if (sdata) {
-                sdata = sdata.replaceAll(porxyOrigin, "https://copilot.microsoft.com");
-                url.searchParams.set("DATA", sdata);
-            }
-            return config;
-        },
-        //不同域重定向转换
-        async (config) => {
-            const url = config.url as URL;
-            if (url.searchParams.has("cprt")) {
-                url.hostname = url.searchParams.get("cprt") as string;
-                url.searchParams.delete("cprt");
-                return config;
-            }
-            if (url.searchParams.has("cprtp")) {
-                url.port = url.searchParams.get("cprtp") as string;
-                url.searchParams.delete("cprtp");
-
-            }
-            if (url.searchParams.has("cprtl")) {
-                url.protocol = url.searchParams.get("cprtl") as string;
-                url.searchParams.delete("cprtl");
-            }
-            return config;
         }
 
-    ], [
+        {//不同域重定向转换
+            if (url.searchParams.has("cprt")) { //cprt -> hostname
+                url.hostname = url.searchParams.get("cprt") as string;
+                url.searchParams.delete("cprt");
+            } else {
+                if (url.searchParams.has("cprtp")) { //cprtp -> port
+                    url.port = url.searchParams.get("cprtp") as string;
+                    url.searchParams.delete("cprtp");
+
+                }
+                if (url.searchParams.has("cprtl")) {//cprtl -> protocol
+                    url.protocol = url.searchParams.get("cprtl") as string;
+                    url.searchParams.delete("cprtl");
+                }
+            }
+        }
+        return config;
+    },
+    async resTranslator(config, res, req, env) {//修改返回
+        const reqUrl = new URL(req.url);
         //基本转换
-        async (config) => {
-            config.init.headers = new Headers(config.init.headers);
-            return config;
-        },
-        //set-cookie转换
-        async (config) => {
-            const resHeaders = config.init.headers as Headers;
+        config.init.headers = new Headers(config.init.headers);
+
+        {//set-cookie转换
             const newheaders = new Headers();
-            for (const headerPer of resHeaders) {
+            for (const headerPer of config.init.headers as Headers) {
                 const key = headerPer[0];
                 let value = headerPer[1];
                 if (key.toLocaleLowerCase() == 'set-cookie') {
-                    value = value.replace(/[Dd]omain=\.?[0-9a-z]*\.?microsoft\.com/, `Domain=.${porxyHostName}`);
-                    value = value.replace(/[Dd]omain=\.?[0-9a-z]*\.?live\.com/, `Domain=.${porxyHostName}`);
-                    value = value.replace(/[Dd]omain=\.?[0-9a-z]*\.?bing\.com/, `Domain=.${porxyHostName}`);
+                    value = value.replace(/[Dd]omain=\.?[0-9a-z]*\.?microsoft\.com/, `Domain=.${reqUrl.hostname}`);
+                    value = value.replace(/[Dd]omain=\.?[0-9a-z]*\.?live\.com/, `Domain=.${reqUrl.hostname}`);
+                    value = value.replace(/[Dd]omain=\.?[0-9a-z]*\.?bing\.com/, `Domain=.${reqUrl.hostname}`);
                 }
                 newheaders.append(key, value);
             }
             config.init.headers = newheaders;
-            return config;
-        },
-        //txt文本域名替换
-        async (config, res) => {
+        }
+
+        {//txt文本替换
             const resHeaders = config.init.headers as Headers;
             const contentType = res.headers.get("Content-Type");
             if (!contentType || (!contentType.startsWith("text/") && !contentType.startsWith("application/javascript") && !contentType.startsWith("application/json"))) {
@@ -248,11 +281,11 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
             let retBody = await res.text();
             const resUrl = new URL(res.url);
 
-            retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-            retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-            retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-            retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
-            retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${porxyOrigin}`);
+            retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+            retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+            retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+            retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+            retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
 
             //特定页面注入脚本
             if (resUrl.pathname == "/") {
@@ -273,67 +306,21 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
                 retBody = injectionHtmlToBody(retBody, LoginInJectionBody);
             }
             config.body = retBody;
-            return config;
-        },
+        }
+
         //重定向转换
-        async (config, res) => {
-            if (res.status < 300 || res.status >= 400) {
-                return config;
-            }
+        if (res.status >= 300 && res.status < 400) {
             const resHeaders = config.init.headers as Headers;
             const loto = resHeaders.get("Location");
-            if (!loto) {
-                return config;
+            if (loto && loto.toLowerCase().startsWith("http")) {
+                const lotoUrl = new URL(loto);
+                lotoUrl.hostname = reqUrl.hostname;
+                lotoUrl.port = reqUrl.port;
+                lotoUrl.protocol = reqUrl.protocol;
+                resHeaders.set("Location", lotoUrl.toString());
             }
-            if (!loto.toLowerCase().startsWith("http")) {
-                return config;
-            }
-            const lotoUrl = new URL(loto);
-            lotoUrl.hostname = porxyHostName;
-            lotoUrl.port = porxyPort;
-            lotoUrl.protocol = porxyProtocol;
-            resHeaders.set("Location", lotoUrl.toString());
-            return config;
         }
-    ]);
-}
-
-async function websocketPorxy(request: Request): Promise<Response> {
-    const reqUrl = new URL(request.url);
-    reqUrl.hostname = 'sydney.bing.com';
-    reqUrl.protocol = 'https:';
-    reqUrl.port = '';
-    const headers = new Headers(request.headers);
-    if (headers.get("origin")) {
-        headers.set("origin", "https://copilot.microsoft.com")
+        return config;
     }
-    headers.append("X-forwarded-for", XForwardedForIP);
-    return fetch(reqUrl, {
-        body: request.body,
-        headers: headers,
-        method: request.method
-    }) as any;
-}
-
-function handleOptions(request: Request) {
-    let url = new URL(request.url);
-    const corsHeaders = {
-        // 'Access-Control-Allow-Origin': *,
-        'Access-Control-Allow-Origin': url.origin,
-        'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
-        'Access-Control-Allow-Headers': request.headers.get('Access-Control-Request-Headers') || '',
-        'Access-Control-Max-Age': '86400',
-    };
-    return new Response(null, { headers: corsHeaders });
-}
-
-/** 注入到head */
-function injectionHtmlToHead(html: string, sc: string) {
-    return html.replace("<head>", `<head>${sc}`)
-}
-
-/** 注入到body */
-function injectionHtmlToBody(html: string, sc: string) {
-    return html.replace("<body>", `<body>${sc}`)
-}
+});
 
