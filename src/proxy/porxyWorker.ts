@@ -69,6 +69,10 @@ export async function porxyWorker(request: Request, env: Env): Promise<Response>
             ) {
                 url.hostname = "copilot.microsoft.com"
             }
+            // bing请求
+            if(p.startsWith("/opaluqu/")){
+                url.hostname = "www.bing.com"
+            }
             // login请求
             if (
                 p == "/GetCredentialType.srf" ||
