@@ -65,9 +65,9 @@ export const bingPorxyWorker = newProxyLinkHttp<Env>({
         //验证
         const reqUrl = new URL(req.url);
         if (reqUrl.pathname == "/challenge/verify") {
-            return verify(req);
+            return verify(req,env);
         }
-        if(reqUrl.pathname == '/turing/captcha/challenge' && (!reqUrl.searchParams.get('h'))){
+        if(reqUrl.pathname == '/turing/captcha/challenge' && (!reqUrl.searchParams.has('h'))){
             return new Response(ChallengeResponseBody,{
                 headers:{
                     'Content-Type':"text/html; charset=utf-8"
