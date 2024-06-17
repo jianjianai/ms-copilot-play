@@ -217,6 +217,15 @@ npm run deploy
 </details>
 
 
+## 环境变量
+|名称|作用|
+|---|---|
+|```BYPASS_SERVER```|如果为空或者没配置则使用内置pass服务通过验证，如果配置了则使用配置的pass服务器通过验证。本项目将 [Harry-zklcdc/go-bingai-pass](Harry-zklcdc/go-bingai-pass) 打包在一起一键部署，一般情况下此环境变量无需配置。|
+
+
+## 鸣谢
+- 通过机器验证认证使用隔壁 [Harry-zklcdc/go-proxy-bingai](go-proxy-bingai ) 同款技术 [Harry-zklcdc/go-bingai-pass](Harry-zklcdc/go-bingai-pass)。 感谢 [Harry-zklcdc](https://github.com/Harry-zklcdc) 大佬的付出。
+
 
 ## 交流社区
 - QQ群: 829264603
