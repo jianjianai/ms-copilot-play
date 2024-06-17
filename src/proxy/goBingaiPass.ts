@@ -2,9 +2,9 @@ import { fCFF } from '../go-bingai-pass/worker';
 
 async function verifyFCFF(request: Request,evn:Env): Promise<Response> {
     let cookie: string = request.headers.get('Cookie') || '';
-    if(evn.XForwardedForIP){
-        cookie = `${cookie?(cookie+"; "):""}BingAI_Rand_IP=${evn.XForwardedForIP}`;
-    }
+    // if(evn.XForwardedForIP){
+    //     cookie = `${cookie?(cookie+"; "):""}BingAI_Rand_IP=${evn.XForwardedForIP}`;
+    // }
     const currentUrl = new URL(request.url);
     const resData = await fCFF({
         'IG': currentUrl.searchParams.get('IG'),
@@ -13,7 +13,7 @@ async function verifyFCFF(request: Request,evn:Env): Promise<Response> {
         'convId': currentUrl.searchParams.get('convId'),
         'rid': currentUrl.searchParams.get('rid'),
         'T': currentUrl.searchParams.get('T'),
-        'host': "",
+        'host': currentUrl.hostname,
     });
     const cookies = resData.result.cookies.split('; ');
     const newRes = Response.json(JSON.stringify(resData));
