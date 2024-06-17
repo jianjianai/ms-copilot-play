@@ -19,7 +19,7 @@ async function verifyFCFF(IG,iframeid,convId,rid,T){
             await cookieStore.set(k,v);
         }
     }
-    console.log("verifyFCFF",resData);
+    console.log("verifyFCFF",JSON.stringify(resData));
 }
 
 window.onload =  async function() {
