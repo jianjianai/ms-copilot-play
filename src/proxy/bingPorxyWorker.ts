@@ -283,6 +283,7 @@ export const bingPorxyWorker = newProxyLinkHttp<Env>({
 
             retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
             retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+            retBody = retBody.replace(/https?:\/\/account\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
             retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
             retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
             retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
