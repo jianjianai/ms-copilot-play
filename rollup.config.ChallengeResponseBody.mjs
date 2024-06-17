@@ -17,6 +17,6 @@ export default {
         wasm({
             targetEnv:"auto-inline"
         }),
-        compiler()
+        // compiler()
     ]
 };
