@@ -10,7 +10,7 @@ async function verifyFCFF(request: Request): Promise<Response> {
         'convId': currentUrl.searchParams.get('convId'),
         'rid': currentUrl.searchParams.get('rid'),
         'T': currentUrl.searchParams.get('T'),
-        'host': "",
+        'host': currentUrl.hostname,
     });
     const cookies = resData.result.cookies.split('; ');
     const newRes = Response.json(JSON.stringify(resData));
