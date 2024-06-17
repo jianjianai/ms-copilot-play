@@ -8,7 +8,7 @@ import { verify } from './goBingaiPass';
 import ChallengeResponseBody from '../html/ChallengeResponseBody.html'
 
 
-const XForwardedForIP = usIps[Math.floor(Math.random() * usIps.length)][0];
+
 
 /** websocket */
 async function websocketPorxy(request: Request): Promise<Response> {
@@ -51,7 +51,7 @@ function injectionHtmlToBody(html: string, sc: string) {
     return html.replace("<body>", `<body>${sc}`)
 }
 
-export const bingPorxyWorker = newProxyLinkHttp<Env>({
+const bingProxyLink = newProxyLinkHttp<Env>({
     async intercept(req, env) {//拦截
         // 处理 websocket
         const upgradeHeader = req.headers.get('Upgrade');
@@ -152,7 +152,9 @@ export const bingPorxyWorker = newProxyLinkHttp<Env>({
         }
 
         // XForwardedForIP 设置
-        (config.init.headers as Headers).set("X-forwarded-for", XForwardedForIP);
+        if(env.XForwardedForIP){
+            (config.init.headers as Headers).set("X-forwarded-for", env.XForwardedForIP);
+        }
 
         {// origin 设置
             const resHeaders = config.init.headers as Headers;
@@ -331,4 +333,13 @@ export const bingPorxyWorker = newProxyLinkHttp<Env>({
         return config;
     }
 });
+
+const XForwardedForIP = usIps[Math.floor(Math.random() * usIps.length)][0];
+export const bingPorxyWorker = (req: Request,env:Env)=>{
+    // 初始化 环境变量
+    env.XForwardedForIP = env.XForwardedForIP || XForwardedForIP;
+    // 开始请求
+    return bingProxyLink(req,env);
+}
+
 
