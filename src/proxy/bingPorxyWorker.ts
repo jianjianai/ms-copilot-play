@@ -283,39 +283,43 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         {//txt文本替换
             const resHeaders = config.init.headers as Headers;
             const contentType = res.headers.get("Content-Type");
-            if (!contentType || (!contentType.startsWith("text/") && !contentType.startsWith("application/javascript") && !contentType.startsWith("application/json"))) {
-                return config;
+            if( contentType && (
+                    contentType.startsWith("text/") || 
+                    contentType.startsWith("application/javascript") ||
+                    contentType.startsWith("application/json")
+                )
+            ){
+                resHeaders.delete("Content-Md5");
+                let retBody = await res.text();
+                const resUrl = new URL(res.url);
+    
+                retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+                retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+                retBody = retBody.replace(/https?:\/\/account\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+                retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+                retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+                retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+    
+                //特定页面注入脚本
+                if (resUrl.pathname == "/") {
+                    retBody = injectionHtmlToHead(retBody, CopilotInjection);
+                }
+                //音乐页面脚本注入
+                if (resUrl.pathname == "/videos/music") {
+                    retBody = injectionHtmlToHead(retBody, MusicInJection);
+                }
+                //图片生成注入
+                if (
+                    resUrl.pathname == "/images/create" ||
+                    (resUrl.pathname.startsWith("/images/create/") && !resUrl.pathname.startsWith("/images/create/async/"))
+                ) {
+                    retBody = injectionHtmlToHead(retBody, ImagesCreateInJection);
+                }
+                if (resUrl.pathname == "/login.srf") {
+                    retBody = injectionHtmlToBody(retBody, LoginInJectionBody);
+                }
+                config.body = retBody;
             }
-            resHeaders.delete("Content-Md5");
-            let retBody = await res.text();
-            const resUrl = new URL(res.url);
-
-            retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
-            retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
-            retBody = retBody.replace(/https?:\/\/account\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
-            retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
-            retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
-            retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
-
-            //特定页面注入脚本
-            if (resUrl.pathname == "/") {
-                retBody = injectionHtmlToHead(retBody, CopilotInjection);
-            }
-            //音乐页面脚本注入
-            if (resUrl.pathname == "/videos/music") {
-                retBody = injectionHtmlToHead(retBody, MusicInJection);
-            }
-            //图片生成注入
-            if (
-                resUrl.pathname == "/images/create" ||
-                (resUrl.pathname.startsWith("/images/create/") && !resUrl.pathname.startsWith("/images/create/async/"))
-            ) {
-                retBody = injectionHtmlToHead(retBody, ImagesCreateInJection);
-            }
-            if (resUrl.pathname == "/login.srf") {
-                retBody = injectionHtmlToBody(retBody, LoginInJectionBody);
-            }
-            config.body = retBody;
         }
 
         //重定向转换
