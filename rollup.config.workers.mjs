@@ -21,8 +21,7 @@ export default {
         html({
 			include: '**/*.html'
 		}),
-        compiler({
-            compilation_level:"ADVANCED"
-        })
-    ]
+        compiler(),
+    ],
+    external:id=>(id.endsWith(".wasm"))
 };

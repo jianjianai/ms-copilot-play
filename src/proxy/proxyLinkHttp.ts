@@ -1,33 +1,50 @@
-export type ReqHttpConfig = {url:string | URL, init:RequestInit};
-export type ReqHttpTranslator = (config:ReqHttpConfig,req:Request)=> Promise<ReqHttpConfig>;
-export type ResHttpConfig = {body:BodyInit|null,init:ResponseInit};
-export type ReshttpTranslator = (config:ResHttpConfig,res:Response) => Promise<ResHttpConfig>;
-export async function proxyLinkHttp(req:Request,reqTranslators:ReqHttpTranslator[],resTranslators:ReshttpTranslator[]){
-    let reqConfig:ReqHttpConfig = {
-        url:req.url,
-        init:{
-            method:req.method,
-            headers:req.headers,
-            body:req.body,
-            redirect:"manual"
+export type ReqHttpConfig = { url: string | URL, init: RequestInit };
+export type ReqHttpTranslator<ENV> = (config: ReqHttpConfig, req: Request,env:ENV) => Promise<ReqHttpConfig>;
+export type ResHttpConfig = { body: BodyInit | null, init: ResponseInit };
+export type ReshttpTranslator<ENV> = (config: ResHttpConfig, res: Response , req: Request,env:ENV) => Promise<ResHttpConfig>;
+export type Intercept<ENV> = (req: Request,env:ENV) => Promise<Response | null>;
+
+export type NewProxyLinkHttpConfig<ENV> = {
+    /**
+     * 拦截请求
+     */
+    intercept: Intercept<ENV>, 
+    /**
+     * 请求编辑
+     */
+    reqTranslator: ReqHttpTranslator<ENV>, 
+    /**
+     * 响应编辑
+     */
+    resTranslator: ReshttpTranslator<ENV>
+}
+
+export function newProxyLinkHttp<ENV>({intercept,reqTranslator,resTranslator}:NewProxyLinkHttpConfig<ENV>) {
+    return async function(req: Request,env:ENV):Promise<Response> {
+        const interceptRes = await intercept(req,env);
+        if (interceptRes) {
+            return interceptRes;
         }
-    }
-    for(const reqT of reqTranslators){
-        reqConfig = await reqT(reqConfig,req);
-    }
-    if(req.url===reqConfig.url){
-        return new Response("not curl",{status:400});
-    }
-    const res = await fetch(reqConfig.url,reqConfig.init);
-    let resConfig:ResHttpConfig = {
-        body:res.body as any,
-        init:{
-            status:res.status,
-            headers:res.headers
+        const reqConfig = await reqTranslator({
+            url: req.url,
+            init: {
+                method: req.method,
+                headers: req.headers,
+                body: req.body,
+                redirect: "manual"
+            }
+        }, req,env);
+        if (req.url === reqConfig.url) {
+            return new Response("not curl", { status: 400 });
         }
+        const res = await fetch(reqConfig.url, reqConfig.init);
+        const resConfig  = await resTranslator({
+            body: res.body as any,
+            init: {
+                status: res.status,
+                headers: res.headers
+            }
+        }, res as any,req,env);
+        return new Response(resConfig.body, resConfig.init);
     }
-    for (const resT of resTranslators) {
-        resConfig = await resT(resConfig,res as any);
-    }
-    return new Response(resConfig.body,resConfig.init);
 }
