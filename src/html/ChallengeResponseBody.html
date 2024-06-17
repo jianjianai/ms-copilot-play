@@ -1,36 +1,7 @@
 <html>
 
 <head>
-    <script type="text/javascript">        
-        async function ChallengeComplete() {
-            const IG = window.parent._G.IG;
-            const convId = window.parent.CIB.manager.conversation.id;
-            const rid = window.parent.CIB.manager.conversation.messages[0].requestId;
-            const iframeid = new URL(window.location.href).searchParams.get('iframeid');
-            const T = await window.parent.aesEncrypt('Harry-zklcdc/go-proxy-bingai',IG);
-
-            await fetch('/challenge/verify?IG=' + encodeURI(IG) + '&iframeid=' + encodeURI(iframeid) + '&convId=' + encodeURI(convId) + '&rid=' + encodeURI(rid) + '&T=' + encodeURI(T), {
-                credentials: 'include',
-            }).then((res) => {
-                if (res.ok) {
-                    window.parent.postMessage("verificationComplete", "*");
-                } else {
-                    if (res.status === 451) {
-                        const verifyContainer = document.getElementById('verifyContainer');
-                        verifyContainer.innerHTML = '';
-                        let newElement = document.createElement('h4');
-                        newElement.textContent = "您似乎是盗版软件受害者,该项目在 Github 开源。"
-                        verifyContainer.appendChild(newElement);
-                    } else {
-                        window.parent.postMessage("verificationFailed", "*");
-                    }
-                }
-            }).catch(() => {
-                window.parent.postMessage("verificationFailed", "*");
-            });
-        }
-        window.onload = ChallengeComplete;
-    </script>
+    <script src="/ChallengeResponseBody.js"></script>
     <style>
         .n-base-loading {
             position: relative;

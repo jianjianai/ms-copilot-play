@@ -5,7 +5,8 @@ import MusicInJection from '../html/MusicInJection.html';
 import ImagesCreateInJection from '../html/ImagesCreateInJection.html';
 import LoginInJectionBody from '../html/LoginInJectionBody.html';
 import { verify } from './goBingaiPass';
-import ChallengeResponseBody from '../html/ChallengeResponseBody.html'
+import ChallengeResponseBody from '../html/ChallengeResponseBody.html';
+import ChallengeResponseBody_js from '../../.tmp/ChallengeResponseBody.js.txt';
 
 
 
@@ -73,6 +74,13 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                     'Content-Type':"text/html; charset=utf-8"
                 }
             });
+        }
+        if(reqUrl.pathname == "/ChallengeResponseBody.js"){
+            return new Response(ChallengeResponseBody_js,{
+                headers:{
+                    'Content-Type':"application/javascript; charset=utf-8"
+                }
+            })
         }
         return null;
     },

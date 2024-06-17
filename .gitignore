@@ -174,4 +174,5 @@ dist
 iptest/iiptest.js
 iptest/iiptest/iiptest*.txt
 functions/
-go-bingai-pass.wasm
+.tmp
+

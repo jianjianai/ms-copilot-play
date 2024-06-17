@@ -1,11 +1,11 @@
 import './wasm_exec.js'
-import WASM from '../go-bingai-pass.wasm'
+import WASM from '../../.tmp/go-bingai-pass.wasm'
 
 export const fCFF  = async (req) => {
   const go = new Go();
 
   
-  const instance = await WebAssembly.instantiate(WASM, go.importObject);
+  const { instance } = await WASM(go.importObject);
   go.run(instance, {});
 
   let res = await new Promise((resolve, reject) => {
@@ -37,7 +37,7 @@ export const fCFF  = async (req) => {
 export const getTokenRequest = async () => {
   const go = new Go();
 
-  const instance = await WebAssembly.instantiate(WASM, go.importObject);
+  const { instance } = await WASM(go.importObject);
   go.run(instance, {});
 
   let res = await new Promise((resolve) => {
