@@ -133,11 +133,15 @@ export const bingPorxyWorker = newProxyLinkHttp<Env>({
             ) {
                 url.hostname = "login.live.com"
             }
-            if(p.startsWith("/proofs/")){
+            // login account请求
+            if(
+                p.startsWith("/proofs/") || 
+                p=="/SummaryPage.aspx"
+            ){
                 url.hostname = "account.live.com"
             }
             //storage请求
-            if (p.startsWith("/users/")) {
+            if (p.startsWith("/users/") ) {
                 url.hostname = "storage.live.com"
             }
             //bing验证请求
@@ -207,7 +211,7 @@ export const bingPorxyWorker = newProxyLinkHttp<Env>({
                     url.searchParams.set("return_url", requrl.replace(porxyOrigin, "https://copilot.microsoft.com"));
                 }
             }
-            if (p == "/Identity/Dropdown" || p == "/Identity/Hamburger") {
+            if (p == "/Identity/Dropdown" || p == "/Identity/Hamburger" || p=="/proofs/Add") {
                 let requrl = url.searchParams.get("ru");
                 if (requrl) {
                     url.searchParams.set("ru", requrl.replace(porxyOrigin, "https://copilot.microsoft.com"));
