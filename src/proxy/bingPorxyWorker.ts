@@ -133,6 +133,9 @@ export const bingPorxyWorker = newProxyLinkHttp<Env>({
             ) {
                 url.hostname = "login.live.com"
             }
+            if(p.startsWith("/proofs/")){
+                url.hostname = "account.live.com"
+            }
             //storage请求
             if (p.startsWith("/users/")) {
                 url.hostname = "storage.live.com"
