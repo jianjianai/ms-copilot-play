@@ -68,6 +68,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         if (reqUrl.pathname == "/challenge/verify") {
             return verify(req,env);
         }
+        //客户端请求验证接口
         if(reqUrl.pathname == '/turing/captcha/challenge' && (!reqUrl.searchParams.has('h'))){
             return new Response(ChallengeResponseBody,{
                 headers:{
@@ -85,19 +86,17 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         return null;
     },
     async reqTranslator(config, req, env) {//修改请求
-        const url = new URL(config.url);
-        config.url = url;
         {   //基础转换
-            url.port = ""
-            url.protocol = 'https:';
+            config.url.port = ""
+            config.url.protocol = 'https:';
             config.init.headers = new Headers(config.init.headers);
         }
 
         {//重定向请求
-            const p = url.pathname;
+            const p = config.url.pathname;
             //sydney的请求
             if (p.startsWith("/sydney/")) {
-                url.hostname = "sydney.bing.com";//设置链接
+                config.url.hostname = "sydney.bing.com";//设置链接
             }
             //copilot的请求
             if (
@@ -123,11 +122,11 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 p.startsWith("/pwa/") ||
                 p.startsWith("/videos/")
             ) {
-                url.hostname = "copilot.microsoft.com"
+                config.url.hostname = "copilot.microsoft.com"
             }
             // bing请求
             if (p.startsWith("/opaluqu/")) {
-                url.hostname = "www.bing.com"
+                config.url.hostname = "www.bing.com"
             }
             // login请求
             if (
@@ -139,23 +138,23 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 p == "/GetExperimentAssignments.srf" ||
                 p == "/logout.srf"
             ) {
-                url.hostname = "login.live.com"
+                config.url.hostname = "login.live.com"
             }
             // login account请求
             if(
                 p.startsWith("/proofs/") || 
                 p=="/SummaryPage.aspx"
             ){
-                url.hostname = "account.live.com"
+                config.url.hostname = "account.live.com"
             }
             //storage请求
             if (p.startsWith("/users/") ) {
-                url.hostname = "storage.live.com"
+                config.url.hostname = "storage.live.com"
             }
             //bing验证请求
             if(p=='/turing/captcha/challenge'){
-                url.hostname = "www.bing.com";
-                url.searchParams.delete('h');
+                config.url.hostname = "www.bing.com";
+                config.url.searchParams.delete('h');
             }
         }
 
@@ -168,7 +167,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             const resHeaders = config.init.headers as Headers;
             const origin = resHeaders.get('Origin');
             if (origin) {
-                const url = config.url as URL;
+                const url = config.url;
                 const originUrl = new URL(origin);
                 originUrl.protocol = "https:";
                 originUrl.port = '';
@@ -207,6 +206,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         }
 
         {//修改登录请求 /secure/Passport.aspx 
+            const url = config.url;
             const p = url.pathname;
             const porxyOrigin = new URL(req.url).origin;
             if (p == "/secure/Passport.aspx" || p == "/passport.aspx") {
@@ -251,6 +251,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         }
 
         {//不同域重定向转换
+            const url = config.url;
             if (url.searchParams.has("cprt")) { //cprt -> hostname
                 url.hostname = url.searchParams.get("cprt") as string;
                 url.searchParams.delete("cprt");
@@ -288,10 +289,14 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             config.init.headers = newheaders;
         }
 
-        {//txt文本替换
+         {//txt文本替换
+            const resUrl = new URL(res.url);
             const resHeaders = config.init.headers as Headers;
             const contentType = res.headers.get("Content-Type");
-            if( contentType && (
+            
+            if( resUrl.pathname!="/turing/captcha/challenge" && // 这个路径是验证接口，不进行处理
+                contentType && 
+                (
                     contentType.startsWith("text/") || 
                     contentType.startsWith("application/javascript") ||
                     contentType.startsWith("application/json")
@@ -299,8 +304,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             ){
                 resHeaders.delete("Content-Md5");
                 let retBody = await res.text();
-                const resUrl = new URL(res.url);
-    
+
                 retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/account\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);

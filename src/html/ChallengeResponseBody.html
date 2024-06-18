@@ -3,65 +3,157 @@
 <head>
     <script src="/ChallengeResponseBody.js"></script>
     <style>
-        .n-base-loading {
-            position: relative;
-            line-height: 0;
-            width: 1em;
-            height: 1em;
+        .verifyContainer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 300px;
+            height: 63px;
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 0 10px;
         }
 
-        .n-spin {
-            display: inline-flex;
-            height: var(--n-size);
-            width: var(--n-size);
-            font-size: var(--n-size);
-            color: var(--n-color);
+        #success-icon {
+            display: flex;
+            margin-right: 8px;
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 #038127;
+            width: 30px;
+            height: 30px;
+            animation: scale-up-center 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+            stroke-width: 6px;
+            stroke: #f8f8f8;
+            stroke-miterlimit: 10;
         }
 
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
+        #spinner-icon {
+            display: flex;
+            margin-right: 8px;
+            width: 30px;
+            height: 30px;
+            animation: rotate 5s linear infinite;
+        }
 
+        @keyframes rotate {
             100% {
                 transform: rotate(360deg);
             }
         }
 
-        .verifyContainer {
+        @keyframes scale-up-center {
+            0% {
+                transform: scale(0.01);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .circle {
+            stroke-width: 3px;
+            stroke-linecap: round;
+            stroke: #000000;
+            stroke-dasharray: 0, 100, 0;
+            stroke-dashoffset: 200;
+            stroke-miterlimit: 1;
+            stroke-linejoin: round;
+        }
+
+        .success-circle {
+            stroke-dashoffset: 0;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #1d1f20;
+            fill: #1d1f20;
+        }
+
+        .cb-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            margin-left: 11px;
+        }
+
+        #fail-icon {
+            display: flex;
+            margin-right: 8px;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            stroke-width: 6px;
+            stroke: #f8f8f8;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0 0 0 #1d1f20;
+            animation: fillfail-offlabel 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+        }
+
+        .failure-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #1d1f20;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes fillfail-offlabel {
+            100% {
+                box-shadow: inset 0 0 0 30px #1d1f20;
+            }
         }
     </style>
 </head>
 
 <body>
+    <p id="error-text" style="font-size: 10px;margin: 0;border: 0;color: red;display: none;"></p>
     <div id="verifyContainer" class="verifyContainer">
-        <div class="n-base-loading n-spin" role="img" aria-label="loading"
-            style="--n-bezier: cubic-bezier(.4, 0, .2, 1); --n-opacity-spinning: 0.5; --n-size: 40px; --n-color: #2080f0; --n-text-color: #18a058;"
-            style="width: 48px">
-            <div class="n-base-loading__transition-wrapper" style="width: 48px">
-                <div class="n-base-loading__container">
-                    <svg class="n-base-loading__icon" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                        <g>
-                            <animateTransform attributeName="transform" type="rotate" values="0 100 100;270 100 100"
-                                begin="0s" dur="1.6s" fill="freeze" repeatCount="indefinite"></animateTransform>
-                            <circle class="n-base-loading__icon" fill="none" stroke="currentColor" stroke-width="16"
-                                stroke-linecap="round" cx="100" cy="100" r="92" stroke-dasharray="567"
-                                stroke-dashoffset="1848">
-                                <animateTransform attributeName="transform" type="rotate"
-                                    values="0 100 100;135 100 100;450 100 100" begin="0s" dur="1.6s" fill="freeze"
-                                    repeatCount="indefinite"></animateTransform>
-                                <animate attributeName="stroke-dashoffset" values="567;142;567" begin="0s" dur="1.6s"
-                                    fill="freeze" repeatCount="indefinite"></animate>
-                            </circle>
-                        </g>
-                    </svg>
-                </div>
+        <div id="success" class="cb-container" style="display: none;align-items: center; visibility: visible;"
+            role="alert">
+            <svg id="success-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" aria-hidden="true">
+                <circle class="success-circle" cx="26" cy="26" r="25"></circle>
+                <path class="p1" d="m13,26l9.37,9l17.63,-18"></path>
+            </svg>
+            <span id="success-text">成功！</span>
+        </div>
+        <div id="verifying" class="cb-container" style="display: flex; visibility: visible;align-items: center;">
+            <svg id="spinner-icon" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                class="">
+                <line x1="15" x2="15" y1="1.5" y2="5.5" class="circle"></line>
+                <line x1="24.5459" x2="24.5459" y1="5.45405" y2="10.45405" transform="rotate(45 24.5459 5.45405)"
+                    class="circle"></line>
+                <line x1="28.5" x2="28.5" y1="15" y2="20" transform="rotate(90 28.5 15)" class="circle"></line>
+                <line x1="24.5459" x2="24.5459" y1="24.546" y2="29.546" transform="rotate(135 24.5459 24.546)"
+                    class="circle"></line>
+                <line x1="15" x2="15" y1="28.5" y2="33.5" transform="rotate(180 15 28.5)" class="circle"></line>
+                <line x1="5.4541" x2="5.4541" y1="24.5459" y2="29.5459" transform="rotate(-135 5.4541 24.5459)"
+                    class="circle"></line>
+                <line x1="1.5" x2="1.5" y1="15" y2="20" transform="rotate(-90 1.5 15)" class="circle"></line>
+                <line x1="5.45408" x2="5.45408" y1="5.45404" y2="10.45404" transform="rotate(-45 5.45408 5.45404)"
+                    class="circle"></line>
+            </svg>
+            <div id="verifying-msg">
+                <span id="verifying-text">人机验证中...</span>
             </div>
         </div>
-        <h4>自动通过人机验证中<br>请耐心等待...</h4>
+        <div id="fail" class="cb-container" style="display: none; visibility: visible;" role="alert">
+            <svg id="fail-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" aria-hidden="true">
+                <circle class="failure-circle" cx="26" cy="26" r="25" fill="none"></circle>
+                <path class="failure-cross" fill="none" d="M14.1 27.2 l24.124.2"></path>
+            </svg>
+            <div id="failure-msg">
+                <span id="fail-text">失败！</span>
+                <br><span id="fr-helper"><a href="https://github.com/Harry-zklcdc/go-bingai-pass"
+                        id="fr-helper-link">遇到问题？</a></span>
+            </div>
+        </div>
     </div>
 </body>
 
