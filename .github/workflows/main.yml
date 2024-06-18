@@ -28,4 +28,4 @@ jobs:
           # Your Cloudflare Account ID
           accountId: ${{ secrets.CF_ACCOUNT_ID }} # optional
           # The Wrangler command (along with any arguments) you wish to run. Multiple Wrangler commands can be run by separating each command with a newline. Defaults to `"deploy"`.
-          command: deploy # optional
+          command: 'deploy --keep-vars'
