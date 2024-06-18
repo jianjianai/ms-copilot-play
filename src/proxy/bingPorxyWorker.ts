@@ -67,6 +67,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         if (reqUrl.pathname == "/challenge/verify") {
             return verify(req,env);
         }
+        //客户端请求验证接口
         if(reqUrl.pathname == '/turing/captcha/challenge' && (!reqUrl.searchParams.has('h'))){
             return new Response(ChallengeResponseBody,{
                 headers:{
@@ -280,10 +281,14 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             config.init.headers = newheaders;
         }
 
-        {//txt文本替换
+         {//txt文本替换
+            const resUrl = new URL(res.url);
             const resHeaders = config.init.headers as Headers;
             const contentType = res.headers.get("Content-Type");
-            if( contentType && (
+            
+            if( resUrl.pathname!="/turing/captcha/challenge" && // 这个路径是验证接口，不进行处理
+                contentType && 
+                (
                     contentType.startsWith("text/") || 
                     contentType.startsWith("application/javascript") ||
                     contentType.startsWith("application/json")
@@ -291,8 +296,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             ){
                 resHeaders.delete("Content-Md5");
                 let retBody = await res.text();
-                const resUrl = new URL(res.url);
-    
+
                 retBody = retBody.replace(/https?:\/\/sydney\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/login\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/account\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
