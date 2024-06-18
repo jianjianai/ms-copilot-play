@@ -16,7 +16,7 @@ async function verifyFCFF(request: Request,evn:Env): Promise<Response> {
         'host': currentUrl.hostname,
     });
     const cookies = resData.result.cookies.split('; ');
-    const newRes = Response.json(JSON.stringify(resData));
+    const newRes = Response.json(resData);
     for (let v of cookies) {
         newRes.headers.append('Set-Cookie', v + '; path=/');
     }
@@ -49,7 +49,7 @@ async function  verifyPass(request:Request,bypassServer:string){
     }
     const resData = await res.json() as any;
     const cookies = resData.result.cookies.split('; ')
-    const newRes = Response.json(JSON.stringify(resData));
+    const newRes = Response.json(resData);
     for (let v of cookies) {
         newRes.headers.append('Set-Cookie', v + '; path=/');
     }

@@ -1,4 +1,4 @@
-export type ReqHttpConfig = { url: string | URL, init: RequestInit };
+export type ReqHttpConfig = { url: URL, init: RequestInit };
 export type ReqHttpTranslator<ENV> = (config: ReqHttpConfig, req: Request,env:ENV) => Promise<ReqHttpConfig>;
 export type ResHttpConfig = { body: BodyInit | null, init: ResponseInit };
 export type ReshttpTranslator<ENV> = (config: ResHttpConfig, res: Response , req: Request,env:ENV) => Promise<ResHttpConfig>;
@@ -26,7 +26,7 @@ export function newProxyLinkHttp<ENV>({intercept,reqTranslator,resTranslator}:Ne
             return interceptRes;
         }
         const reqConfig = await reqTranslator({
-            url: req.url,
+            url: new URL(req.url),
             init: {
                 method: req.method,
                 headers: req.headers,
@@ -34,8 +34,9 @@ export function newProxyLinkHttp<ENV>({intercept,reqTranslator,resTranslator}:Ne
                 redirect: "manual"
             }
         }, req,env);
-        if (req.url === reqConfig.url) {
-            return new Response("not curl", { status: 400 });
+        
+        if (reqConfig.url.hostname == new URL(req.url).hostname) {
+            return new Response("Same hostname", { status: 404 });
         }
         const res = await fetch(reqConfig.url, reqConfig.init);
         const resConfig  = await resTranslator({
