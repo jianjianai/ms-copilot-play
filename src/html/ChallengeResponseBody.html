@@ -21,7 +21,7 @@
                     if (res.status === 451) {
                         throw "您似乎是盗版软件受害者,该项目在 Github 开源。"
                     } else {
-                        throw "失败!"
+                        throw await res.text();
                     }
                 }
                 const rjson = await res.text();
