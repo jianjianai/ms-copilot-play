@@ -24,8 +24,8 @@
                         throw "失败!"
                     }
                 }
-                const rjson = await res.json();
-                if(!rjson.result.cookies || !rjson.result.cookies || rjson.result.cookies.indexOf("ctt")<0){
+                const rjson = await res.text();
+                if(rjson.indexOf("cct=")<0){
                     throw "Harry-zklcdc/go-bingai-pass 服务器似乎没有正常工作！请检查BYPASS_SERVER环境变量是否正确配置。";
                 }
             }
