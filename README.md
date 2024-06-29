@@ -1,4 +1,4 @@
-# microsoft-copilot-porxy
+# microsoft-copilot-play
 ## 简介
 
 **Cloudflare Worker 的 Microsoft Copilot 加速服务。**
