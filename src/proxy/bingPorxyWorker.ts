@@ -82,7 +82,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
 						if(env.MCP_PASSWD){
 							const cookies = parseCookies(req.headers.get("Cookie"));
 							if(cookies["MCP_PASSWD"]!=env.MCP_PASSWD){
-								return new Response(McpPasswd,{
+								return new Response(McpPasswd.replace("$PromptMessage",JSON.stringify(env.LOGIN_PROMPT_MSG)),{
 									status:403,
 									headers:{
 										'Content-Type':"text/html; charset=utf-8"
