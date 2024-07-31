@@ -25,6 +25,7 @@
 
 
 ## 演示站
+密码：123456
 - Copilot -> https://copilot.6m6c.cn/
 - Copilot(新版) -> https://copilot.6m6c.cn/?dpwa=1
 - Designer -> https://copilot.6m6c.cn/images/create
