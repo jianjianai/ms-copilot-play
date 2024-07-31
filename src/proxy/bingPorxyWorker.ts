@@ -6,6 +6,7 @@ import ImagesCreateInJection from '../html/ImagesCreateInJection.html';
 import LoginInJectionBody from '../html/LoginInJectionBody.html';
 import { verify } from './goBingaiPass';
 import ChallengeResponseBody from '../html/ChallengeResponseBody.html'
+import McpPasswd from '../html/McpPasswd.html'
 import { parseCookies, serializeCookies } from './cookie';
 
 
@@ -81,8 +82,11 @@ const bingProxyLink = newProxyLinkHttp<Env>({
 						if(env.MCP_PASSWD){
 							const cookies = parseCookies(req.headers.get("Cookie"));
 							if(cookies["MCP_PASSWD"]!=env.MCP_PASSWD){
-								return new Response("Forbidden",{
-									status:403
+								return new Response(McpPasswd,{
+									status:403,
+									headers:{
+										'Content-Type':"text/html; charset=utf-8"
+									}
 								});
 							}
 						}
