@@ -48,7 +48,7 @@
 
 <details>
 <summary>直接登录(推荐)</summary>
-	
+
 - 1.点击登录按钮
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/4c926bfe-8e7c-4336-a1d1-95bb46c32b44)
@@ -137,7 +137,7 @@ npm run build-page
 <details>
 <summary>详细教学，点击展开</summary>
 
-	
+
 1. 点击这个部署按钮
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jianjianai/microsoft-copilot-porxy)
@@ -150,7 +150,7 @@ npm run build-page
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/1d6c1272-1d48-4120-9181-0eaf137851a9)
 
-4. 去复制账户id 
+4. 去复制账户id
 
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/f22c5e02-0742-4222-8e91-7104756de804)
 
@@ -203,7 +203,7 @@ npm run build-page
 ![image](https://github.com/jianjianai/microsoft-copilot-porxy/assets/59829816/a4595828-d79d-48c8-81df-c16304941c91)
 
 
-> **默认的 `.workers.dev` 国内已被限制访问，需要使用自定义域才可正常访问。** 
+> **默认的 `.workers.dev` 国内已被限制访问，需要使用自定义域才可正常访问。**
 > 具体方法请[点击此处](https://www.bing.com/search?q=cloudflare+workers+%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%9F%E5%90%8D)查找
 
 
@@ -259,9 +259,11 @@ npm run deploy
 
 
 ## 环境变量
-|名称|作用|
-|---|---|
-|```BYPASS_SERVER```|如果为空或者没配置则使用内置pass服务通过验证，如果配置了则使用配置的pass服务器通过验证。本项目将 [Harry-zklcdc/go-bingai-pass](Harry-zklcdc/go-bingai-pass) 打包在一起一键部署，一般情况下此环境变量无需配置。|
+| 名称                    | 作用                                                                                                                                        |
+|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| ```BYPASS_SERVER```   | 如果为空或者没配置则使用内置pass服务通过验证，如果配置了则使用配置的pass服务器通过验证。本项目将 [Harry-zklcdc/go-bingai-pass](Harry-zklcdc/go-bingai-pass) 打包在一起一键部署，一般情况下此环境变量无需配置。 |
+| ```XForwardedForIP``` | 如果配置了此环境变量，则使用此IP作为X-Forwarded-For头部，不配置则使用随机USIP                                                                                         |
+| ```MCP_PASSWD```      | 密码授权，如果配置了此环境变量则需要输入正确的密码才能使用                                                                                                             |
 
 
 ## 鸣谢

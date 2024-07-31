@@ -1,0 +1,59 @@
+<html lang="zh-cn">
+<head>
+	<meta charset="UTF-8">
+	<title>ms-copilot-play 认证</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			height: 100%;
+			width: 100%;
+		}
+
+		:root {
+			font-size: 16px;
+		}
+
+		body {
+			display: flex;
+			align-items: center;
+			justify-content: space-evenly;
+			flex-direction: column;
+		}
+
+		.content {
+			max-width: 30rem;
+			border: 0.1rem solid rgba(145, 145, 145, 0.44);
+			border-radius: 1rem;
+			padding: 1rem;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+<div class="content">
+	<h1>密码认证</h1>
+	<p id="error" style="display: none;color: red">密码错误</p>
+	<input type="password" id="passwd">
+	<button id="ok-button">验证</button>
+</div>
+<div></div>
+<script>
+	cookieStore.get('MCP_PASSWD').then((e) => {
+		if (e.value) {
+			document.getElementById('error').style.display = 'block';
+		}
+	});
+	document.getElementById('ok-button').addEventListener('click', function() {
+		const passwd = document.getElementById('passwd').value;
+		cookieStore.set({
+			name: 'MCP_PASSWD',
+			value: passwd,
+			sameSite: 'none'
+		}).then(() => {
+			location.reload();
+		});
+	});
+</script>
+</body>
+</html>
