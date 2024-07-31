@@ -4,4 +4,5 @@ interface Env {
     BYPASS_SERVER?: string,
     XForwardedForIP?: string,
 		MCP_PASSWD?: string,
+		LOGIN_PROMPT_MSG?: string,
 }

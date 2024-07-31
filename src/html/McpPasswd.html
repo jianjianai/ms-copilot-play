@@ -1,47 +1,105 @@
-<html lang="zh-cn">
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	<script>let PromptMessage;</script>
+	<script>PromptMessage = $PromptMessage;</script>
 	<meta charset="UTF-8">
-	<title>ms-copilot-play 认证</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
 	<style>
-		html, body {
+		* {
 			margin: 0;
 			padding: 0;
-			height: 100%;
-			width: 100%;
 		}
-
-		:root {
-			font-size: 16px;
+		html,body,.container {
+			min-height: 100vh;
+			width: 100vw;
 		}
-
-		body {
+		.container {
+			background: radial-gradient(ellipse 100% 100% at 50% 50%, #FFEDF6 22%,#FFFFFF 52%);
 			display: flex;
 			align-items: center;
-			justify-content: space-evenly;
-			flex-direction: column;
+			justify-content: center;
 		}
-
-		.content {
-			max-width: 30rem;
-			border: 0.1rem solid rgba(145, 145, 145, 0.44);
+		.login-wrapper {
+			background-color: #fff;
+			width: 22rem;
+			max-width: calc(100vw - min(3rem, 5vw));
+			height: 25rem;
 			border-radius: 1rem;
-			padding: 1rem;
+			padding: 0 min(3rem, 5vw);
+			box-shadow: 2px 1px 20px 0 #7777771f;
+		}
+		.title{
+			height: 12rem;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			gap: 0.5rem;
+		}
+		.header {
+			font-size: 2rem;
+			font-weight: bold;
+			text-align: center;
+		}
+		.input-item {
+			display: block;
+			width: 100%;
+			border: 0;
+			padding: 0.5rem 0;
+			border-bottom: 0.1rem solid rgb(128, 125, 125);
+			font-size: 1rem;
+			outline: none;
+		}
+		.input-item::placeholder {
+			text-transform: uppercase;
+		}
+		.btn {
+			text-align: center;
+			padding: 0.7rem 0;
+			width: 100%;
+			background-color: #ff8ec7;
+			color: #fff;
+			margin-top: 2.5rem;
+			cursor: pointer;
+			transition: background-color 0.25s;
+		}
+		.btn:hover{
+			background-color: #ff70b8;
+		}
+		.error{
+			color: red;
+			font-size: 0.9rem;
+		}
+		#prompt-message{
 			text-align: center;
 		}
 	</style>
 </head>
 <body>
-<div class="content">
-	<h1>密码认证</h1>
-	<p id="error" style="display: none;color: red">密码错误</p>
-	<input type="password" id="passwd">
-	<button id="ok-button">验证</button>
+<div class="container">
+	<div class="login-wrapper">
+		<div class="title">
+			<div class="header">登录</div>
+			<div id="prompt-message" style="display: none"></div>
+		</div>
+		<div class="form-wrapper">
+			<input id="passwd" type="password" name="password" placeholder="password" class="input-item">
+			<p id="error" style="display: none" class="error">密码错误</p>
+			<div id="ok-button" class="btn">登录</div>
+		</div>
+	</div>
 </div>
-<div></div>
 <script>
+	if(PromptMessage){
+		const el = document.getElementById("prompt-message");
+		el.innerHTML = PromptMessage;
+		el.style.display = "block";
+	}
 	cookieStore.get('MCP_PASSWD').then((e) => {
-		if (e.value) {
+		if (e && e.value) {
 			document.getElementById('error').style.display = 'block';
+			cookieStore.delete('MCP_PASSWD');
 		}
 	});
 	document.getElementById('ok-button').addEventListener('click', function() {
