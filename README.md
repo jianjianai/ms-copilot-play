@@ -247,12 +247,12 @@ npm run deploy
 
 
 ## 环境变量
-| 名称                    | 作用                                                                                                                                        |
-|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| ```BYPASS_SERVER```   | 如果为空或者没配置则使用内置pass服务通过验证，如果配置了则使用配置的pass服务器通过验证。本项目将 [Harry-zklcdc/go-bingai-pass](Harry-zklcdc/go-bingai-pass) 打包在一起一键部署，一般情况下此环境变量无需配置。 |
-| ```XForwardedForIP``` | 如果配置了此环境变量，则使用此IP作为X-Forwarded-For头部，不配置则使用随机USIP                                                                                         |
-| ```MCP_PASSWD```      | 密码授权，如果配置了此环境变量则需要输入正确的密码才能使用                                                                                                             |
-
+| 名称                     | 作用                                                                                                                                        |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| ```BYPASS_SERVER```    | 如果为空或者没配置则使用内置pass服务通过验证，如果配置了则使用配置的pass服务器通过验证。本项目将 [Harry-zklcdc/go-bingai-pass](Harry-zklcdc/go-bingai-pass) 打包在一起一键部署，一般情况下此环境变量无需配置。 |
+| ```XForwardedForIP```  | 如果配置了此环境变量，则使用此IP作为X-Forwarded-For头部，不配置则使用随机USIP                                                                                         |
+| ```MCP_PASSWD```       | 密码授权，如果配置了此环境变量则需要输入正确的密码才能使用                                                                                                             |
+| ```LOGIN_PROMPT_MSG``` | 登录提示消息，显示在标题下方，可以是html                                                                                                                    |
 
 ## 鸣谢
 - 通过机器验证认证使用隔壁 [Harry-zklcdc/go-proxy-bingai](go-proxy-bingai ) 同款技术 [Harry-zklcdc/go-bingai-pass](Harry-zklcdc/go-bingai-pass)。 感谢 [Harry-zklcdc](https://github.com/Harry-zklcdc) 大佬的付出。
