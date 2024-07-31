@@ -6,6 +6,7 @@ import ImagesCreateInJection from '../html/ImagesCreateInJection.html';
 import LoginInJectionBody from '../html/LoginInJectionBody.html';
 import { verify } from './goBingaiPass';
 import ChallengeResponseBody from '../html/ChallengeResponseBody.html'
+import { parseCookies, serializeCookies } from './cookie';
 
 
 
@@ -75,6 +76,17 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 }
             });
         }
+				//登录验证
+				{
+						if(env.MCP_PASSWD){
+							const cookies = parseCookies(req.headers.get("Cookie"));
+							if(cookies["MCP_PASSWD"]!=env.MCP_PASSWD){
+								return new Response("Forbidden",{
+									status:403
+								});
+							}
+						}
+				}
         return null;
     },
     async reqTranslator(config, req, env) {//修改请求
@@ -134,7 +146,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             }
             // login account请求
             if(
-                p.startsWith("/proofs/") || 
+                p.startsWith("/proofs/") ||
                 p=="/SummaryPage.aspx"
             ){
                 config.url.hostname = "account.live.com"
@@ -197,7 +209,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             }
         }
 
-        {//修改登录请求 /secure/Passport.aspx 
+        {//修改登录请求 /secure/Passport.aspx
             const url = config.url;
             const p = url.pathname;
             const porxyOrigin = new URL(req.url).origin;
@@ -259,6 +271,13 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 }
             }
         }
+
+				{//cookie修改
+						const resHeaders = config.init.headers as Headers;
+						const cookies = parseCookies(resHeaders.get("Cookie"));
+						delete cookies["MCP_PASSWD"];
+						resHeaders.set("Cookie",serializeCookies(cookies));
+				}
         return config;
     },
     async resTranslator(config, res, req, env) {//修改返回
@@ -285,11 +304,11 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             const resUrl = new URL(res.url);
             const resHeaders = config.init.headers as Headers;
             const contentType = res.headers.get("Content-Type");
-            
+
             if( resUrl.pathname!="/turing/captcha/challenge" && // 这个路径是验证接口，不进行处理
-                contentType && 
+                contentType &&
                 (
-                    contentType.startsWith("text/") || 
+                    contentType.startsWith("text/") ||
                     contentType.startsWith("application/javascript") ||
                     contentType.startsWith("application/json")
                 )
@@ -303,7 +322,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
-    
+
                 //特定页面注入脚本
                 if (resUrl.pathname == "/") {
                     retBody = injectionHtmlToHead(retBody, CopilotInjection);
