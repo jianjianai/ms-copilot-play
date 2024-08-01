@@ -58,13 +58,19 @@
 			text-align: center;
 			padding: 0.7rem 0;
 			width: 100%;
-			background-color: #ff8ec7;
-			color: #fff;
+			color: #cdcdcd;
 			margin-top: 2.5rem;
 			cursor: pointer;
 			transition: background-color 0.25s;
+			display: block;
+			border: none;
+			background-color: #ffbee0;
 		}
-		.btn:hover{
+		.btn.boning{
+			background-color: #ff8ec7;
+			color: #fff;
+		}
+		.btn.boning:hover{
 			background-color: #ff70b8;
 		}
 		.error{
@@ -86,7 +92,7 @@
 		<div class="form-wrapper">
 			<input id="passwd" type="password" name="password" placeholder="请输入密码" class="input-item">
 			<p id="error" style="display: none" class="error">密码错误</p>
-			<div id="ok-button" class="btn">登录</div>
+			<button id="ok-button" class="btn boning">登录</button>
 		</div>
 	</div>
 </div>
@@ -103,6 +109,8 @@
 		}
 	});
 	document.getElementById('ok-button').addEventListener('click', function() {
+		this.innerText = '登录中...';
+		this.classList.remove("boning");
 		const passwd = document.getElementById('passwd').value;
 		cookieStore.set({
 			name: 'MCP_PASSWD',
