@@ -1,5 +1,11 @@
 {
     "installCommand": "pnpm install",
     "buildCommand": "pnpm run build-vercel",
-    "outputDirectory": "./dist"
+    "outputDirectory": "./dist",
+    "routes": [
+        {
+            "src": "/.*",
+            "dest": "/api/server"
+        }
+    ]
 }

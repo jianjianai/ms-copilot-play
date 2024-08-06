@@ -19,20 +19,6 @@ export default createRollupOptions({
             "deploymentTarget": "v8-worker",
             "entrypoint": "server.js"
         })),
-        writeFile(join(outputPath, "config.json"), JSON.stringify({
-            "version": 3,
-            "routes": [
-                {
-                    "src": "^/.*$",
-                    "dest": "/api/server"
-                }
-            ],
-            "framework": {
-                "version": "5.3.3"
-            },
-            "crons": []
-        }
-        )),
         writeFile('./dist/index.html', '<html><body><h1>vercel error</h1></body></html>'),
     ]
 });
