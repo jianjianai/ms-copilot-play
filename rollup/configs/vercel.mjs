@@ -33,5 +33,6 @@ export default createRollupOptions({
             "crons": []
         }
         )),
+        writeFile('./dist/index.html', '<html><body><h1>vercel error</h1></body></html>'),
     ]
 });
