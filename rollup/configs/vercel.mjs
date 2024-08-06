@@ -17,7 +17,7 @@ export default createRollupOptions({
         writeFile(join(outputPath, "functions/api/server.func/.vc-config.json"), JSON.stringify({
             "runtime": "edge",
             "deploymentTarget": "v8-worker",
-            "entrypoint": "verceldown.js"
+            "entrypoint": "server.js"
         })),
         writeFile(join(outputPath, "config.json"), JSON.stringify({
             "version": 3,
