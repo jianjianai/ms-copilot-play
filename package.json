@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "deploy": "npm run build-worker && wrangler deploy",
-    "dev": "wrangler dev",
+    "worker-dev": "wrangler dev",
     "iptest": "npx tsc ./iptest/iiptest.ts && node ./iptest/iiptest.js",
     "build-worker": "rollup --config ./rollup/configs/cloudflare.workers.mjs",
     "build-page": "rollup --config ./rollup/configs/cloudflare.pages.mjs",
