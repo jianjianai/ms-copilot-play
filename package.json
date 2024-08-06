@@ -8,7 +8,8 @@
     "iptest": "npx tsc ./iptest/iiptest.ts && node ./iptest/iiptest.js",
     "build-worker": "rollup --config ./rollup/configs/cloudflare.workers.mjs",
     "build-page": "rollup --config ./rollup/configs/cloudflare.pages.mjs",
-    "build-vercel": "rollup --config ./rollup/configs/vercel.mjs"
+    "build-vercel": "rollup --config ./rollup/configs/vercel.mjs",
+    "build-netlify": "rollup --config ./rollup/configs/netlify.mjs"
   },
   "devDependencies": {
     "@ampproject/rollup-plugin-closure-compiler": "^0.27.0",

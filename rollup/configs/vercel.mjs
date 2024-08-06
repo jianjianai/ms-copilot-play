@@ -5,7 +5,7 @@ import writeFile from '../plugins/writeFile.mjs';
 
 const outputPath = process.env.VERCEL_URL ? '/vercel/output' : "./.vercel/output";
 export default createRollupOptions({
-    input: 'src/vercel.ts',
+    input: 'src/netlify.ts',
     output: [
         {
             file: join(outputPath, "functions/api/server.func/server.js"),
