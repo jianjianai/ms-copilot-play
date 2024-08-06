@@ -68,30 +68,30 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         //验证
         const reqUrl = new URL(req.url);
         if (reqUrl.pathname == "/challenge/verify") {
-            return verify(req,env);
+            return verify(req, env);
         }
         //客户端请求验证接口
-        if(reqUrl.pathname == '/turing/captcha/challenge' && (!reqUrl.searchParams.has('h'))){
-            return new Response(ChallengeResponseBody,{
-                headers:{
-                    'Content-Type':"text/html; charset=utf-8"
+        if (reqUrl.pathname == '/turing/captcha/challenge' && (!reqUrl.searchParams.has('h'))) {
+            return new Response(ChallengeResponseBody, {
+                headers: {
+                    'Content-Type': "text/html; charset=utf-8"
                 }
             });
         }
-				//登录验证
-				{
-						if(env.MCP_PASSWD){
-							const cookies = parseCookies(req.headers.get("Cookie"));
-							if(cookies["MCP_PASSWD"]!=env.MCP_PASSWD){
-								return new Response(McpPasswd.replace("$PromptMessage",JSON.stringify(env.LOGIN_PROMPT_MSG)),{
-									status:403,
-									headers:{
-										'Content-Type':"text/html; charset=utf-8"
-									}
-								});
-							}
-						}
-				}
+        //登录验证
+        {
+            if (env.MCP_PASSWD) {
+                const cookies = parseCookies(req.headers.get("Cookie"));
+                if (cookies["MCP_PASSWD"] != env.MCP_PASSWD) {
+                    return new Response(McpPasswd.replace("$PromptMessage", JSON.stringify(env.LOGIN_PROMPT_MSG)), {
+                        status: 403,
+                        headers: {
+                            'Content-Type': "text/html; charset=utf-8"
+                        }
+                    });
+                }
+            }
+        }
         return null;
     },
     async reqTranslator(config, req, env) {//修改请求
@@ -152,25 +152,25 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 config.url.hostname = "login.live.com"
             }
             // login account请求
-            if(
+            if (
                 p.startsWith("/proofs/") ||
-                p=="/SummaryPage.aspx"
-            ){
+                p == "/SummaryPage.aspx"
+            ) {
                 config.url.hostname = "account.live.com"
             }
             //storage请求
-            if (p.startsWith("/users/") ) {
+            if (p.startsWith("/users/")) {
                 config.url.hostname = "storage.live.com"
             }
             //bing验证请求
-            if(p=='/turing/captcha/challenge'){
+            if (p == '/turing/captcha/challenge') {
                 config.url.hostname = "www.bing.com";
                 config.url.searchParams.delete('h');
             }
         }
 
         // XForwardedForIP 设置
-        if(env.XForwardedForIP){
+        if (env.XForwardedForIP) {
             (config.init.headers as Headers).set("X-forwarded-for", env.XForwardedForIP);
         }
 
@@ -232,7 +232,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                     url.searchParams.set("return_url", requrl.replace(porxyOrigin, "https://copilot.microsoft.com"));
                 }
             }
-            if (p == "/Identity/Dropdown" || p == "/Identity/Hamburger" || p=="/proofs/Add") {
+            if (p == "/Identity/Dropdown" || p == "/Identity/Hamburger" || p == "/proofs/Add") {
                 let requrl = url.searchParams.get("ru");
                 if (requrl) {
                     url.searchParams.set("ru", requrl.replace(porxyOrigin, "https://copilot.microsoft.com"));
@@ -279,12 +279,12 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             }
         }
 
-				{//cookie修改
-						const resHeaders = config.init.headers as Headers;
-						const cookies = parseCookies(resHeaders.get("Cookie"));
-						delete cookies["MCP_PASSWD"];
-						resHeaders.set("Cookie",serializeCookies(cookies));
-				}
+        {//cookie修改
+            const resHeaders = config.init.headers as Headers;
+            const cookies = parseCookies(resHeaders.get("Cookie"));
+            delete cookies["MCP_PASSWD"];
+            resHeaders.set("Cookie", serializeCookies(cookies));
+        }
         return config;
     },
     async resTranslator(config, res, req, env) {//修改返回
@@ -307,19 +307,19 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             config.init.headers = newheaders;
         }
 
-         {//txt文本替换
+        {//txt文本替换
             const resUrl = new URL(res.url);
             const resHeaders = config.init.headers as Headers;
             const contentType = res.headers.get("Content-Type");
 
-            if( resUrl.pathname!="/turing/captcha/challenge" && // 这个路径是验证接口，不进行处理
+            if (resUrl.pathname != "/turing/captcha/challenge" && // 这个路径是验证接口，不进行处理
                 contentType &&
                 (
                     contentType.startsWith("text/") ||
                     contentType.startsWith("application/javascript") ||
                     contentType.startsWith("application/json")
                 )
-            ){
+            ) {
                 resHeaders.delete("Content-Md5");
                 let retBody = await res.text();
 
@@ -369,11 +369,11 @@ const bingProxyLink = newProxyLinkHttp<Env>({
 });
 
 const XForwardedForIP = usIps[Math.floor(Math.random() * usIps.length)][0];
-export const bingPorxyWorker = (req: Request,env:Env)=>{
+export const bingPorxyWorker = (req: Request, env: Env) => {
     // 初始化 环境变量
     env.XForwardedForIP = env.XForwardedForIP || XForwardedForIP;
     // 开始请求
-    return bingProxyLink(req,env);
+    return bingProxyLink(req, env);
 }
 
 
