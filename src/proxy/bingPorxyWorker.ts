@@ -19,6 +19,7 @@ async function websocketPorxy(request: Request): Promise<Response> {
     reqUrl.protocol = 'https:';
     reqUrl.port = '';
     const headers = new Headers(request.headers);
+    headers.delete("Host");
     if (headers.get("origin")) {
         headers.set("origin", "https://copilot.microsoft.com")
     }
@@ -97,7 +98,9 @@ const bingProxyLink = newProxyLinkHttp<Env>({
         {   //基础转换
             config.url.port = ""
             config.url.protocol = 'https:';
-            config.init.headers = new Headers(config.init.headers);
+            const headers = new Headers(config.init.headers);
+            config.init.headers = headers;
+            headers.delete("Host");
         }
 
         {//重定向请求
