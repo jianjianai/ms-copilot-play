@@ -119,7 +119,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 p.startsWith("/sydchat/") ||
                 p.startsWith("/turing/") ||
                 p.startsWith("/th") ||
-                p.startsWith("/Identity/") ||
+                p.toLocaleLowerCase().startsWith("/identity/") ||
                 p.startsWith("/hamburger/") ||
                 p.startsWith("/secure/") ||
                 p == "/bingufsync" ||
@@ -229,7 +229,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                     url.searchParams.set("return_url", requrl.replace(porxyOrigin, "https://copilot.microsoft.com"));
                 }
             }
-            if (p == "/Identity/Dropdown" || p == "/Identity/Hamburger" || p=="/proofs/Add") {
+            if (p.toLocaleLowerCase().startsWith('/identity/') || p=="/proofs/Add") {
                 let requrl = url.searchParams.get("ru");
                 if (requrl) {
                     url.searchParams.set("ru", requrl.replace(porxyOrigin, "https://copilot.microsoft.com"));
