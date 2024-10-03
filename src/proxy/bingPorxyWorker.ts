@@ -164,6 +164,10 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 config.url.hostname = "www.bing.com";
                 config.url.searchParams.delete('h');
             }
+            // studiostaticassetsprod.azureedge.net 资源请求
+            if(p.startsWith("/bundle-cmc/")){
+                config.url.hostname = "studiostaticassetsprod.azureedge.net";
+            }
         }
 
         // XForwardedForIP 设置
@@ -303,6 +307,10 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             }
             config.init.headers = newheaders;
         }
+        {//删除content-security-policy返回头
+            const headers = config.init.headers as Headers;
+            headers.delete("content-security-policy");
+        }
 
          {//txt文本替换
             const resUrl = new URL(res.url);
@@ -326,6 +334,7 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+                retBody = retBody.replace(/https?:\/\/studiostaticassetsprod\.azureedge\.net(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
 
                 //特定页面注入脚本
                 if (resUrl.pathname == "/") {
