@@ -19,6 +19,10 @@ const isipok=async (ip:string)=>{
         return false;
     }
     const txt = await ret.text();
+    if(txt.indexOf("studiostaticassetsprod.azureedge.net/bundle-cmc/assets/bundle.js")>=0){
+        console.log(ip,"nononononon");
+        return false;
+    }
     const rt = /Region:"(.*?)"/.exec(txt);
     if(!rt){
         console.log(ip,false);
