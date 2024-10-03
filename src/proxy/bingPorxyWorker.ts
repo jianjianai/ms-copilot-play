@@ -13,9 +13,9 @@ import { parseCookies, serializeCookies } from './cookie';
 
 
 /** websocket */
-async function websocketPorxy(request: Request): Promise<Response> {
+async function websocketPorxy(request: Request,hostname:string): Promise<Response> {
     const reqUrl = new URL(request.url);
-    reqUrl.hostname = 'sydney.bing.com';
+    reqUrl.hostname = hostname;
     reqUrl.protocol = 'https:';
     reqUrl.port = '';
     const headers = new Headers(request.headers);
@@ -55,17 +55,22 @@ function injectionHtmlToBody(html: string, sc: string) {
 
 const bingProxyLink = newProxyLinkHttp<Env>({
     async intercept(req, env) {//拦截
+        const reqUrl = new URL(req.url);
         // 处理 websocket
         const upgradeHeader = req.headers.get('Upgrade');
         if (upgradeHeader && upgradeHeader == 'websocket') {
-            return websocketPorxy(req);
+            if(reqUrl.pathname.startsWith("/sydney/")){
+                return websocketPorxy(req,'sydney.bing.com');
+            }
+            if(reqUrl.pathname.startsWith("/c/api/")){
+                return websocketPorxy(req,'copilot.microsoft.com');
+            }
         }
         // 处理 CORS 请求
         if (req.method === 'OPTIONS') {
             return handleOptions(req);
         }
         //验证
-        const reqUrl = new URL(req.url);
         if (reqUrl.pathname == "/challenge/verify") {
             return verify(req,env);
         }
@@ -128,7 +133,10 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 p.startsWith("/idp/") ||
                 p.startsWith("/cdx/") ||
                 p.startsWith("/pwa/") ||
-                p.startsWith("/videos/")
+                p.startsWith("/videos/") ||
+                p.startsWith("/locales/") ||
+                p.startsWith("/cl/") ||
+                p.startsWith("/c/api/")
             ) {
                 config.url.hostname = "copilot.microsoft.com"
             }
@@ -163,6 +171,10 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             if(p=='/turing/captcha/challenge'){
                 config.url.hostname = "www.bing.com";
                 config.url.searchParams.delete('h');
+            }
+            // studiostaticassetsprod.azureedge.net 资源请求
+            if(p.startsWith("/bundle-cmc/")){
+                config.url.hostname = "studiostaticassetsprod.azureedge.net";
             }
         }
 
@@ -303,6 +315,11 @@ const bingProxyLink = newProxyLinkHttp<Env>({
             }
             config.init.headers = newheaders;
         }
+        {//删除访问权限返回头
+            const headers = config.init.headers as Headers;
+            headers.delete("content-security-policy");
+            headers.delete("access-control-allow-origin")
+        }
 
          {//txt文本替换
             const resUrl = new URL(res.url);
@@ -314,7 +331,8 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 (
                     contentType.startsWith("text/") ||
                     contentType.startsWith("application/javascript") ||
-                    contentType.startsWith("application/json")
+                    contentType.startsWith("application/json") ||
+                    contentType.startsWith("application/x-javascript")
                 )
             ){
                 resHeaders.delete("Content-Md5");
@@ -326,6 +344,10 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 retBody = retBody.replace(/https?:\/\/copilot\.microsoft\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/www\.bing\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
                 retBody = retBody.replace(/https?:\/\/storage\.live\.com(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+                retBody = retBody.replace(/https?:\/\/studiostaticassetsprod\.azureedge\.net(:[0-9]{1,6})?/g, `${reqUrl.origin}`);
+
+                //js中的字符串替换
+                retBody = retBody.replaceAll(`"copilot.microsoft.com/c/api"`,`"${reqUrl.hostname}/c/api"`)
 
                 //特定页面注入脚本
                 if (resUrl.pathname == "/") {
