@@ -173,7 +173,10 @@ const bingProxyLink = newProxyLinkHttp<Env>({
                 config.url.searchParams.delete('h');
             }
             // studiostaticassetsprod.azureedge.net 资源请求
-            if(p.startsWith("/bundle-cmc/")){
+            if(
+                p.startsWith("/bundle-cmc/") ||
+                p.startsWith("/bundle-wpwa/")
+            ){
                 config.url.hostname = "studiostaticassetsprod.azureedge.net";
             }
         }
