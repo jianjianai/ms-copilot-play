@@ -23,6 +23,11 @@ const isipok=async (ip:string)=>{
         console.log(ip,"nononononon");
         return false;
     }
+    if(txt.indexOf('<div class="title" role="heading" aria-level="1">登录以体验 Microsoft Copilot</div>')>=0){
+        console.log(ip,"ddddddddddd");
+        return false;
+    }
+
     const rt = /Region:"(.*?)"/.exec(txt);
     if(!rt){
         console.log(ip,false);
