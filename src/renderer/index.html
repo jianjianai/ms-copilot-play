@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ms-copilot-play-app set up</title>
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    />
+
+    <link href="./assets/main.css" type="text/css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <button id="start">启动</button>
+    <script type="module" src="./src/renderer.ts"></script>
+  </body>
+</html>
