@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as Cookies from './cookie';
+import { url } from 'inspector';
 
 function createWindow(): void {
   // Create the browser window.
@@ -79,108 +80,98 @@ function addIpcMainListen() {
 
 //拦截网络
 app.whenReady().then(() => {
-  async function handle(request: GlobalRequest): Promise<Response> {
-    const requestURL = new URL(request.url);
-    if (requestURL.pathname == "/c/api/start") {
-      return await sendFetch(request, { proxyHost: "8787-jianjianai-mscopilotpla-u1az71ch21f.ws-us116.gitpod.io" });
-    }
-    return await sendFetch(request);
-  }
-  session.defaultSession.protocol.handle('mcpahttps', handle);
-  session.defaultSession.protocol.handle('mcpahttp', handle);
-
-
-  session.defaultSession.webRequest.onBeforeRequest({
-    urls: [
-      "https://copilot.microsoft.com/c/api/start",
-      "http://copilot.microsoft.com/c/api/start"
+  const proxyHost = "8787-jianjianai-mscopilotpla-u1az71ch21f.ws-us116.gitpod.io";
+  function getUrls(host:string){
+    return [
+      `*://${host}/c/api/*`
     ]
+  }
+  session.defaultSession.webRequest.onBeforeRequest({
+    urls: getUrls("copilot.microsoft.com"),
+    types: ['mainFrame' , 'subFrame' , 'stylesheet' , 'script' , 'image' , 'font' , 'object' , 'xhr' , 'ping' , 'cspReport' , 'media' , 'webSocket']
   }, (details, callback) => {
     const url = new URL(details.url);
-    callback({ redirectURL: "mcpa" + url.protocol + "//" + url.host + url.pathname + url.search });
+    console.log(details.url);
+    url.host = proxyHost;
+    callback({ redirectURL: url.toString()});
+  });
+  session.defaultSession.webRequest.onBeforeSendHeaders({
+    urls: getUrls(proxyHost),
+    types: ['mainFrame' , 'subFrame' , 'stylesheet' , 'script' , 'image' , 'font' , 'object' , 'xhr' , 'ping' , 'cspReport' , 'media' , 'webSocket']
+  }, async (details, callback) => {
+    const headers = details.requestHeaders;
+    headers["MCPXXX-TO-HOST"] = "copilot.microsoft.com";
+    headers["MCPXXX-FIP"] = "104.28.1.144";
+    //设置cookie
+    const cookieUrl = new URL(details.url);
+    cookieUrl.host = "copilot.microsoft.com";
+    headers["cookie"] = await getLocalCookiesToRequestHeader(cookieUrl.toString());
+
+    callback({ requestHeaders: headers })
+  });
+  session.defaultSession.webRequest.onHeadersReceived({
+    urls: getUrls(proxyHost),
+    types: ['mainFrame' , 'subFrame' , 'stylesheet' , 'script' , 'image' , 'font' , 'object' , 'xhr' , 'ping' , 'cspReport' , 'media' , 'webSocket']
+  }, async (details, callback) => {
+    const headers = details.responseHeaders;
+    const cookieUrl = new URL(details.url);
+    cookieUrl.host = "copilot.microsoft.com";
+    await setResponseHeadrCookiesToLocal(headers["set-cookie"], cookieUrl.toString());
+    callback({ responseHeaders: headers })
   });
 })
 
-async function sendFetch(request: GlobalRequest, config: { proxyHost?: string } = {}): Promise<Response> {
-  let requestURL = new URL(request.url);
-  if (requestURL.protocol.startsWith("mcpa")) {
-    requestURL = new URL(requestURL.protocol.substring(4) + "//" + requestURL.host + requestURL.pathname + requestURL.search)
-  }
-  const cookieURL = requestURL.toString();
-  const reqhost = requestURL.hostname;
-  const headers = new Headers(request.headers);
-
-  //设置cookie
-  const cookies = await session.defaultSession.cookies.get({ url: cookieURL });
+async function getLocalCookiesToRequestHeader(url: string) {
+  const cookies = await session.defaultSession.cookies.get({ url: url });
   if (cookies.length > 0) {
-    const cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
-    headers.set("Cookie", cookieHeader);
+    return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
   }
+  return undefined;
+}
 
-  //如果代理
-  if (config.proxyHost) {
-    requestURL.hostname = config.proxyHost;
-    //额外代理头
-    headers.set("MCPXXX-TO-HOST", reqhost);
-    headers.set("MCPXXX-FIP", "104.28.1.144");
-  }
-
-  console.log(requestURL.toString(), "----------------------------");
-  console.log(headers)
-  const respones = await fetch(requestURL, {
-    ...request,
-    headers: headers
-  });
-  console.log(respones.headers);
-
-  //处理响应中的 'Set-Cookie' 头部并保存 Cookies
-  const setCookieHeader = respones.headers.get('Set-Cookie');
-  if (setCookieHeader) {
-    const setCookieItems = setCookieHeader.split(',').map(item => item.trim());
-    for (const setCookie of setCookieItems) {
+async function setResponseHeadrCookiesToLocal(serCookies: string[] | undefined, url: string) {
+  if (serCookies) {
+    for (const setCookie of serCookies) {
       const parsedCookie = parseSetCookieHeader(setCookie); // 解析 Set-Cookie 头部
       if (parsedCookie) {
-        await session.defaultSession.cookies.set({...parsedCookie,url:cookieURL});  // 保存 Cookie
+        await session.defaultSession.cookies.set({ ...parsedCookie, url: url });  // 保存 Cookie
       }
     }
   }
 
-  return respones;
-}
-
-// 解析 'Set-Cookie' 头部
-function parseSetCookieHeader(setCookieHeader:string) {
-  const cookie:{
-    name?:string,
-    value?:string,
-    expirationDate?:number,
-    domain?:string,
-    path?:string,
-    secure?:boolean,
-    httpOnly?:boolean
-  } = {};
-  const parts = setCookieHeader.split(/; ?/).map(part => part.trim());
-  console.log(parts);
-  for (const part of parts) {
-    const index = part.indexOf("=");
-    const name = index<0?part:part.substring(0,index);
-    const value = index<0?"":part.substring(index+1);
-    if (!cookie.name) {
-      cookie.name = name;
-      cookie.value = value;
-    } else if (name.toLowerCase() === 'expires') {
-      cookie.expirationDate = new Date(value).getTime() / 1000;
-    } else if (name.toLowerCase() === 'domain') {
-      cookie.domain = value;
-    } else if (name.toLowerCase() === 'path') {
-      cookie.path = value;
-    } else if (name.toLowerCase() === 'secure') {
-      cookie.secure = true;
-    } else if (name.toLowerCase() === 'httponly') {
-      cookie.httpOnly = true;
+  // 解析 'Set-Cookie' 头部
+  function parseSetCookieHeader(setCookieHeader: string) {
+    const cookie: {
+      name?: string,
+      value?: string,
+      expirationDate?: number,
+      domain?: string,
+      path?: string,
+      secure?: boolean,
+      httpOnly?: boolean
+    } = {};
+    const parts = setCookieHeader.split(/; ?/).map(part => part.trim());
+    for (const part of parts) {
+      const index = part.indexOf("=");
+      const name = index < 0 ? part : part.substring(0, index);
+      const value = index < 0 ? "" : part.substring(index + 1);
+      if (!cookie.name) {
+        cookie.name = name;
+        cookie.value = value;
+      } else if (name.toLowerCase() === 'expires') {
+        cookie.expirationDate = new Date(value).getTime() / 1000;
+      } else if (name.toLowerCase() === 'domain') {
+        cookie.domain = value;
+      } else if (name.toLowerCase() === 'path') {
+        cookie.path = value;
+      } else if (name.toLowerCase() === 'secure') {
+        cookie.secure = true;
+      } else if (name.toLowerCase() === 'httponly') {
+        cookie.httpOnly = true;
+      }
     }
+    return cookie;
   }
-  return cookie;
 }
 
 
