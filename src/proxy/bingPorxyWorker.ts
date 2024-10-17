@@ -13,7 +13,7 @@ export const bingPorxyWorker = async (req: Request,env:Env):Promise<Response>=>{
         return new Response("no MCPXXX-TO-HOST",{status:503});
     }
     headers.set("X-forwarded-for",fip);
-    url.hostname = toHost;
+    url.host = toHost;
     return await fetch(url,{...req,headers:headers}) as any;
 }
 
