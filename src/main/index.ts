@@ -140,7 +140,7 @@ async function setResponseHeadrCookiesToLocal(serCookies: string | string[] | un
   }
   for (const setCookie of serCookies) {
     const parsedCookie = parseSetCookieHeader(setCookie); // 解析 Set-Cookie 头部
-    parsedCookie.httpOnly = false; // 为了能够在浏览器中访问到 Cookie，需要将 httpOnly 设置为 false
+    //parsedCookie.httpOnly = false; // 为了能够在浏览器中访问到 Cookie，需要将 httpOnly 设置为 false
     if (parsedCookie) {
       console.log(parsedCookie);
       try {
