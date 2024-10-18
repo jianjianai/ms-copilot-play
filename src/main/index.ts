@@ -79,6 +79,7 @@ function addIpcMainListen() {
 //拦截网络
 app.whenReady().then(() => {
   const proxyHost = "8787-jianjianai-mscopilotpla-u1az71ch21f.ws-us116.gitpod.io";
+  const porxyFIP = "104.28.1.144";
   function isProxyPath(path: string) {
     if (path.startsWith("/c/api")) return true;
     return false;
@@ -97,7 +98,7 @@ app.whenReady().then(() => {
     if (url.hostname == proxyHost && isProxyPath(url.pathname)) {
       const headers = details.requestHeaders;
       headers["MCPXXX-TO-HOST"] = "copilot.microsoft.com";
-      headers["MCPXXX-FIP"] = "104.28.1.144";
+      headers["MCPXXX-FIP"] = porxyFIP;
       //设置cookie
       url.host = "copilot.microsoft.com";
       const localCookies = await getLocalCookiesToRequestHeader(url.toString());
