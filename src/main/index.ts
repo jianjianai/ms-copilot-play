@@ -142,26 +142,24 @@ async function setResponseHeadrCookiesToLocal(serCookies: string | string[] | un
     const parsedCookie = parseSetCookieHeader(setCookie); // 解析 Set-Cookie 头部
     //parsedCookie.httpOnly = false; // 为了能够在浏览器中访问到 Cookie，需要将 httpOnly 设置为 false
     if (parsedCookie) {
-      console.log(parsedCookie);
       try {
         await session.defaultSession.cookies.set({ ...parsedCookie, url: url });  // 保存 Cookie
       } catch (e) {
-        console.log(e);
+        console.log(e, parsedCookie);
       }
     }
   }
 
   // 解析 'Set-Cookie' 头部 01-Jan-1970 08:00:00 GMT; path=/; secure; SameSite=None
   function parseSetCookieHeader(setCookieHeader: string) {
-    console.log(setCookieHeader);
     const cookie: {
-      name?: string,
-      value?: string,
-      expirationDate?: number,
-      domain?: string,
-      path?: string,
-      secure?: boolean,
-      httpOnly?: boolean
+      name?: string;
+      value?: string;
+      domain?: string;
+      path?: string;
+      secure?: boolean;
+      httpOnly?: boolean;
+      expirationDate?: number;
     } = {};
     const parts = setCookieHeader.split(';');
     const firstEqualIndex = parts[0].indexOf('=');
