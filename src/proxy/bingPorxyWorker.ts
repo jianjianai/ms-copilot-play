@@ -1,6 +1,14 @@
 /** CORS */
 function handleOptions(request: Request) {
-    return new Response(null);
+    const corsHeaders = {
+        // 'Access-Control-Allow-Origin': "*",
+        'Access-Control-Allow-Origin': request.headers.get("Origin") || "",
+        'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
+        'Access-Control-Allow-Headers': request.headers.get('Access-Control-Request-Headers') || '',
+        'Access-Control-Max-Age': '86400',
+        'Access-Control-Allow-Credentials': 'true'
+    };
+    return new Response(null, { headers: corsHeaders });
 }
 
 export const bingPorxyWorker = async (req: Request,env:Env):Promise<Response>=>{
