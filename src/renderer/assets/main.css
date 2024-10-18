@@ -1,1 +1,109 @@
+html,body{
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background-color: antiquewhite;
+    overflow: hidden;
+}
+:root{
+    font-size: 16px;
+}
 
+
+
+
+
+
+
+#loading{
+    z-index: 999;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    transition: opacity 0.5s ease-out,transform 0.5s ease-out;
+}
+@keyframes loadingAnimation1 {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+#loading::after{
+    content: 'loading...';
+    position: absolute;
+    top:70%;
+    width: 100%;
+    text-align: center;
+}
+#loading::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 40%;
+    width: 20%;
+    height: 20%;
+    background-color: antiquewhite;
+    animation: loadingAnimation1 0.5s infinite linear;
+}
+#loading.loaded{
+    opacity: 0;
+    transform: scale(10);
+}
+
+
+
+
+
+
+.input-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.input-group input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+.input-group input::placeholder {
+    color: #aaa;
+}
+
+.input-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 25rem;
+    height: 30rem;
+    background-color: rgb(255, 255, 255);
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+#start{
+    height: 2rem;
+    cursor: pointer;
+}

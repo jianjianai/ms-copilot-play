@@ -1,15 +1,26 @@
 import { electronAPI } from "@electron-toolkit/preload";
 
 export const proxyConfig = (() => {
-    let proxyHost = "copilot.microsoft.com";
-    let proxyFIP = "104.28.1.144";
-    electronAPI.ipcRenderer.on('proxyConfig', (event, arg) => {
-        if (arg?.proxyHost) proxyHost = arg.proxyHost;
-        if (arg?.proxyFIP) proxyFIP = arg.proxyFIP;
-        console.log('proxyConfig:', { proxyHost, proxyFIP });
+    let proxyHost;
+    let proxyFIP;
+    const onchanges:(()=>void)[] = [];
+    let loadedPromise = new Promise((resolve) => {
+        let resolveed = false;
+        electronAPI.ipcRenderer.on('proxyConfig', (event, arg) => {
+            if (arg?.proxyHost) proxyHost = arg.proxyHost;
+            if (arg?.proxyFIP) proxyFIP = arg.proxyFIP;
+            console.log('proxyConfig:', { proxyHost, proxyFIP });
+            onchanges.forEach(t=>t());
+            if(!resolveed){
+                resolveed = true;
+                resolve({ proxyHost, proxyFIP });
+            }
+        });
+        electronAPI.ipcRenderer.send('proxyConfig');
     });
-    electronAPI.ipcRenderer.send('proxyConfig');
     return {
+        onLoaded:(t:()=>void) => loadedPromise.then(t),
+        onchange:(t:()=>void) => onchanges.push(t),
         get proxyHost() {
             return proxyHost;
         },

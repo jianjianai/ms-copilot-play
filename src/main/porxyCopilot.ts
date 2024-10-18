@@ -3,7 +3,7 @@ import { getLocalCookiesToRequestHeader, setResponseHeadrCookiesToLocal } from "
 //拦截网络
 app.whenReady().then(() => {
     const proxyConfig = (() => {
-        let proxyHost = "8787-jianjianai-mscopilotpla-u1az71ch21f.ws-us116.gitpod.io";
+        let proxyHost = "copilot.microsoft.com";
         let proxyFIP = "104.28.1.144";
         ipcMain.on('proxyConfig', (event, arg) => {
             if (arg?.proxyHost) proxyHost = arg.proxyHost;
@@ -35,6 +35,9 @@ app.whenReady().then(() => {
     }
     session.defaultSession.webRequest.onBeforeRequest((details, callback) => {
         const url = new URL(details.url);
+        if (proxyConfig.proxyHost == "copilot.microsoft.com") {
+            return callback({});
+        }
         if (url.hostname == "copilot.microsoft.com" && isProxyPath(url.pathname)) {
             url.host = proxyConfig.proxyHost;
             callback({ redirectURL: url.toString() });
@@ -44,6 +47,9 @@ app.whenReady().then(() => {
     });
     session.defaultSession.webRequest.onBeforeSendHeaders(async (details, callback) => {
         const url = new URL(details.url);
+        if (proxyConfig.proxyHost == "copilot.microsoft.com") {
+            return callback({});
+        }
         if (url.hostname == proxyConfig.proxyHost && isProxyPath(url.pathname)) {
             const headers = details.requestHeaders;
             headers["MCPXXX-TO-HOST"] = "copilot.microsoft.com";
@@ -61,6 +67,18 @@ app.whenReady().then(() => {
     });
     session.defaultSession.webRequest.onHeadersReceived(async (details, callback) => {
         const url = new URL(details.url);
+        if (proxyConfig.proxyHost == "copilot.microsoft.com") {
+            if(url.hostname == proxyConfig.proxyHost){
+                const headers = details.responseHeaders || {};
+                headers["Access-Control-Allow-Origin"] = ["*"];
+                headers["Access-Control-Allow-Methods"] = ["GET, POST, PUT, DELETE, OPTIONS"];
+                headers["Access-Control-Allow-Headers"] = ["Content-Type, Authorization"];
+                callback({ responseHeaders: headers });
+                return;
+            }
+            callback({});
+            return;
+        }
         if (url.hostname == proxyConfig.proxyHost && isProxyPath(url.pathname)) {
             const headers = details.responseHeaders || {};
             url.host = "copilot.microsoft.com";

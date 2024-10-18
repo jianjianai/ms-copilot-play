@@ -1,19 +1,39 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>ms-copilot-play-app set up</title>
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
-    />
 
-    <link href="./assets/main.css" type="text/css" rel="stylesheet" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>ms-copilot-play-app set up</title>
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' " />
 
-  <body>
-    <button id="start">启动</button>
-    <script type="module" src="./src/renderer.ts"></script>
-  </body>
+  <link href="./assets/main.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="loading"></div>
+
+  <div class="input-box">
+    <div class="input-group">
+      <label>初始设置</label>
+    </div>
+    <div class="input-group">
+      <label for="proxyHost">PHOST</label>
+      <input id="proxyHost" type="text" placeholder="Enter proxy host" />
+    </div>
+    <div class="input-group">
+      <label for="proxyFIP">FIP</label>
+      <input id="proxyFIP" type="text" placeholder="Enter proxy FIP" />
+    </div>
+    <div id="checkAvailability" class="input-group" style="flex: 1;height: 100%;">
+      正在检查配置可用性...
+    </div>
+    <div class="input-group">
+      <button id="start">启动</button>
+    </div>
+  </div>
+  <script type="module" src="./src/renderer.ts"></script>
+</body>
+
 </html>
