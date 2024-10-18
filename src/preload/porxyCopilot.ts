@@ -1,6 +1,6 @@
 import { electronAPI } from "@electron-toolkit/preload";
 
-const proxyConfig = (() => {
+export const proxyConfig = (() => {
     let proxyHost = "copilot.microsoft.com";
     let proxyFIP = "104.28.1.144";
     electronAPI.ipcRenderer.on('proxyConfig', (event, arg) => {
