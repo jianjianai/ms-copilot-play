@@ -29,7 +29,7 @@ const checkAvailability = async () => {
   debounceTimeout = window.setTimeout(async () => {
     let ok = false;
     try {
-      const response = await fetch("https://copilot.microsoft.com/c/api/start", {
+      const response = await window.api.pFetch("https://copilot.microsoft.com/c/api/start", {
         "headers": {
           "content-type":"application/json"
         },
@@ -38,6 +38,7 @@ const checkAvailability = async () => {
       });
       ok = response.ok;
     } catch (e) {
+      console.error(e);
       checkAvailabilityEl!.style.color = "red";
       checkAvailabilityEl!.innerText = `${e}`;
     }

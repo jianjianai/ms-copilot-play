@@ -68,12 +68,12 @@ app.whenReady().then(() => {
     session.defaultSession.webRequest.onHeadersReceived(async (details, callback) => {
         const url = new URL(details.url);
         if (proxyConfig.proxyHost == "copilot.microsoft.com") {
-            if(url.hostname == proxyConfig.proxyHost){
+            if (url.hostname == proxyConfig.proxyHost && details.method == "OPTIONS") {
                 const headers = details.responseHeaders || {};
                 headers["Access-Control-Allow-Origin"] = ["*"];
                 headers["Access-Control-Allow-Methods"] = ["GET, POST, PUT, DELETE, OPTIONS"];
                 headers["Access-Control-Allow-Headers"] = ["Content-Type, Authorization"];
-                callback({ responseHeaders: headers });
+                callback({ responseHeaders: headers, statusLine: "HTTP/1.1 200 OK" });
                 return;
             }
             callback({});
