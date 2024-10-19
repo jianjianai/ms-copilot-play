@@ -19,10 +19,6 @@ const isipok=async (ip:string)=>{
         return false;
     }
     const txt = await ret.text();
-    if(txt.indexOf("studiostaticassetsprod.azureedge.net/bundle-cmc/assets/bundle.js")>=0){
-        console.log(ip,"nononononon");
-        return false;
-    }
     if(txt.indexOf('<div class="title" role="heading" aria-level="1">登录以体验 Microsoft Copilot</div>')>=0){
         console.log(ip,"ddddddddddd");
         return false;

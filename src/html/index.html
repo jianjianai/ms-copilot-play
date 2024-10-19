@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ms-copilot-play-app</title>
+    <style>
+        html,
+        body {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            background-color: antiquewhite;
+            overflow: hidden;
+        }
+
+        :root {
+            font-size: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .input-group input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        .input-group input::placeholder {
+            color: #aaa;
+        }
+
+        .input-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 25rem;
+            height: 30rem;
+            background-color: rgb(255, 255, 255);
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="input-box">
+        <div class="input-group">
+            <label>初始设置</label>
+        </div>
+        <div class="input-group">
+            <label for="proxyHost">PHOST</label>
+            <input id="proxyHost" type="text" placeholder="Enter proxy host" value="${PHOST}" readonly/>
+        </div>
+        <div class="input-group">
+            <label for="proxyFIP">FIP</label>
+            <input id="proxyFIP" type="text" placeholder="Enter proxy FIP"  value="${FIP}" readonly/>
+        </div>
+        <div class="input-group" style="flex: 1;height: 100%;"></div>
+        <div class="input-group">
+            <label style="text-align: center;">第一步下载app <a href="https://github.com/jianjianai/ms-copilot-play/releases/" target="_blank">前往下载</a></label>
+            <label style="text-align: center;">第二步输入如上配置</label>
+            <label style="text-align: center;">设置完成开始愉快玩耍！</label>
+        </div>
+    </div>
+</body>
+
+</html>
