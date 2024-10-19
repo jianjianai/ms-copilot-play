@@ -6,7 +6,7 @@ export const proxyConfig = (() => {
     const onchanges:(()=>void)[] = [];
     let loadedPromise = new Promise((resolve) => {
         let resolveed = false;
-        electronAPI.ipcRenderer.on('proxyConfig', (event, arg) => {
+        electronAPI.ipcRenderer.on('proxyConfig', (_, arg) => {
             if (arg?.proxyHost) proxyHost = arg.proxyHost;
             if (arg?.proxyFIP) proxyFIP = arg.proxyFIP;
             console.log('proxyConfig:', { proxyHost, proxyFIP });
