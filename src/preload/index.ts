@@ -1,11 +1,9 @@
 import { electronAPI } from '@electron-toolkit/preload'
 import { proxyConfig } from './porxyCopilot'
-import { pFetch } from './pFetch';
 
 // Custom APIs for renderer
 const api = {
-  proxyConfig: proxyConfig,
-  pFetch: pFetch
+  proxyConfig: proxyConfig
 }
 export type Api = typeof api;
 // @ts-ignore (define in dts)

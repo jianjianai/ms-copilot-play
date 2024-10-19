@@ -1,10 +1,28 @@
 import { app, ipcMain, session } from "electron";
 import { getLocalCookiesToRequestHeader, setResponseHeadrCookiesToLocal } from "./cookie";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 //拦截网络
 app.whenReady().then(() => {
     const proxyConfig = (() => {
         let proxyHost = "copilot.microsoft.com";
         let proxyFIP = "104.28.1.144";
+
+        
+        try {
+            if(existsSync("proxyConfig.json")){
+                const file = readFileSync("proxyConfig.json", { encoding: "utf-8" });
+                const config = JSON.parse(file);
+                if (config.proxyHost) proxyHost = config.proxyHost;
+                if (config.proxyFIP) proxyFIP = config.proxyFIP;
+            }
+        } catch (error) {
+            console.log("proxyConfig.json file not found");
+        }
+
+        app.on('quit',()=>{
+            writeFileSync("proxyConfig.json", JSON.stringify({ proxyHost, proxyFIP }));
+        });
+
         ipcMain.on('proxyConfig', (event, arg) => {
             if (arg?.proxyHost) proxyHost = arg.proxyHost;
             if (arg?.proxyFIP) proxyFIP = arg.proxyFIP;
@@ -68,16 +86,7 @@ app.whenReady().then(() => {
     session.defaultSession.webRequest.onHeadersReceived(async (details, callback) => {
         const url = new URL(details.url);
         if (proxyConfig.proxyHost == "copilot.microsoft.com") {
-            if (url.hostname == proxyConfig.proxyHost && details.method == "OPTIONS") {
-                const headers = details.responseHeaders || {};
-                headers["Access-Control-Allow-Origin"] = ["*"];
-                headers["Access-Control-Allow-Methods"] = ["GET, POST, PUT, DELETE, OPTIONS"];
-                headers["Access-Control-Allow-Headers"] = ["Content-Type, Authorization"];
-                callback({ responseHeaders: headers, statusLine: "HTTP/1.1 200 OK" });
-                return;
-            }
-            callback({});
-            return;
+            return callback({});
         }
         if (url.hostname == proxyConfig.proxyHost && isProxyPath(url.pathname)) {
             const headers = details.responseHeaders || {};
@@ -88,13 +97,6 @@ app.whenReady().then(() => {
         }
         callback({});
     });
-
-
-
-
-
-
-
 
 
 });
